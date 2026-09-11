@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Peta Monitoring Pendaki Real-Time</title>
     
-    <!-- CSS Leaflet untuk Peta -->
+    <!-- CSS Leaflet Peta -->
     <link rel="stylesheet" href="https://unpkg.com" />
     
     <style>
@@ -16,7 +16,6 @@
             height: 100%;
             overflow: hidden;
             font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
         }
         #map {
             width: 100% !important;
@@ -51,7 +50,6 @@
 </head>
 <body>
 
-    <!-- Kotak Informasi Pemantauan -->
     <div class="info-box">
         <h3><span id="status-light" class="status-dot"></span> Monitoring: ID 1</h3>
         <p><strong>Latitude:</strong> <span id="txt-lat">Menghubungkan...</span></p>
@@ -59,14 +57,13 @@
         <p><strong>Last Online:</strong> <span id="txt-online">-</span></p>
     </div>
 
-    <!-- Wadah Utama Peta -->
     <div id="map"></div>
 
-    <!-- JS Leaflet (Hanya pustaka ini yang dimuat, sangat ringan) -->
+    <!-- JS Leaflet -->
     <script src="https://unpkg.com"></script>
 
     <script>
-        // 1. Inisialisasi Peta Leaflet secara instan
+        // 1. Inisialisasi Peta Awal
         const map = L.map('map').setView([-6.2088, 106.8456], 13);
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -76,15 +73,14 @@
 
         let pendakiMarker = null;
 
-        // URL REST API Firebase Langsung ke Path Pendaki Anda
+        // Tautkan langsung ke file JSON publik Firebase Anda
         const firebaseURL = "https://firebaseio.com";
 
-        // 2. Fungsi Mengambil Data dari Firebase (Metode HTTP Fetch)
+        // 2. Fungsi Fetch Data Menggunakan Jalur Bypass Terbuka
         async function ambilDataFirebase() {
             try {
-                const response = await fetch(firebaseURL);
-                if (!response.ok) throw new Error("Gagal merespons server");
-                
+                // Menambahkan timestamp acak agar browser Android tidak terjebak cache lama
+                const response = await fetch(`${firebaseURL}?nocache=${new Date().getTime()}`);
                 const data = await response.json();
                 
                 if (data) {
@@ -92,41 +88,37 @@
                     const lng = parseFloat(data.longitude);
                     
                     if (!isNaN(lat) && !isNaN(lng)) {
-                        // Indikator sukses terhubung
                         document.getElementById('status-light').classList.add('status-online');
                         
-                        // Format waktu online
                         let waktuOnline = "Tidak diketahui";
                         if (data.last_online) {
                             const timestamp = parseInt(data.last_online);
                             waktuOnline = !isNaN(timestamp) ? new Date(timestamp).toLocaleString('id-ID') : data.last_online;
                         }
 
-                        // Tampilkan teks ke layar HP
                         document.getElementById('txt-lat').innerText = lat;
                         document.getElementById('txt-lng').innerText = lng;
                         document.getElementById('txt-online').innerText = waktuOnline;
 
-                        // Perbarui Posisi Marker di Peta
                         if (pendakiMarker === null) {
                             pendakiMarker = L.marker([lat, lng]).addTo(map);
-                            pendakiMarker.bindPopup("<b>Pendaki ID_1</b><br>Lokasi Aktif.").openPopup();
-                            map.setView([lat, lng], 15); // Auto center pertama kali
+                            pendakiMarker.bindPopup("<b>Pendaki ID_1</b><br>Posisi Aktif.").openPopup();
+                            map.setView([lat, lng], 15);
                         } else {
                             pendakiMarker.setLatLng([lat, lng]);
                         }
                     }
+                } else {
+                    document.getElementById('txt-lat').innerText = "Data Kosong di Firebase";
                 }
             } catch (error) {
-                console.error("Terjadi kesalahan ambil data:", error.message);
-                document.getElementById('txt-lat').innerText = "Koneksi Bermasalah";
+                document.getElementById('txt-lat').innerText = "Gagal Membuka Akses";
             }
         }
 
-        // 3. Sistem Pengulangan Otomatis (Mengambil data setiap 3 detik sebagai pengganti real-time stream)
-        ambilDataFirebase(); // Jalankan pertama kali saat web dibuka
+        // Jalankan pembaruan data setiap 3 detik sekali
+        ambilDataFirebase(); 
         setInterval(ambilDataFirebase, 3000); 
     </script>
 </body>
 </html>
-
