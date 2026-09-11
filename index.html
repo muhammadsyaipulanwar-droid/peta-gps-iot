@@ -3,154 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Visual GPS Monitor - Firebase IoT</title>
+    <title>Uji Coba Memunculkan Peta</title>
     
-    <!-- MENGGUNAKAN CDN CLOUDFLARE/CDNJS (Jauh lebih cepat & stabil di Indonesia) -->
+    <!-- CSS Leaflet dari CDNJS Cloudflare -->
     <link rel="stylesheet" href="https://cloudflare.com" />
     
     <style>
-        * {
-            box-sizing: border-box;
+        /* Memaksa halaman menggunakan ruang penuh layar */
+        html, body {
             margin: 0;
             padding: 0;
-        }
-        body {
-            display: flex;
-            height: 100vh;
-            font-family: monospace;
-            background: #222;
-            color: #00ff00;
-            overflow: hidden;
+            width: 100%;
+            height: 100%;
+            background-color: #cccccc; /* Warna abu-abu sebagai penanda jika peta gagal */
         }
         
-        /* Panel Kiri: Terminal Log Teks asli Anda */
-        #panel-log {
-            width: 350px;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            border-right: 2px solid #00ff00;
-            background: #111;
-            overflow-y: auto;
-            height: 100vh;
-        }
-        #output-teks {
-            font-size: 13px;
-            white-space: pre-wrap;
-            line-height: 1.4;
-            color: #00ff00;
-            margin-top: 15px;
-        }
-
-        /* Panel Kanan: Wadah Peta Visual (Diberi tinggi eksplisit 100vh agar pasti muncul) */
+        /* Wadah Peta Utama wajib berukuran penuh */
         #map {
-            flex: 1;
-            height: 100vh; 
-            background: #333;
-        }
-
-        /* Sinkronisasi tema Pop-up Peta */
-        .leaflet-popup-content-wrapper {
-            background: #222;
-            color: #00ff00;
-            border: 1px solid #00ff00;
-            font-family: monospace;
-            border-radius: 4px;
-        }
-        .leaflet-popup-tip {
-            background: #222;
-            border: 1px solid #00ff00;
+            width: 100%;
+            height: 100%;
         }
     </style>
 </head>
 <body>
 
-    <!-- PANEL LOG TEKS ASLI ANDA -->
-    <div id="panel-log">
-        <h2>[ LIVE DATA MONITOR ]</h2>
-        <p style="font-size: 11px; color: #888;">Firebase Fetch -> Real-time Map</p>
-        <hr style="border-color: #00ff00; margin-top: 10px;">
-        <pre id="output-teks">Memanggil data IoT & Peta...</pre>
-    </div>
-
-    <!-- PANEL PETA VISUAL -->
+    <!-- KONTEN HANYA PETA SAJA -->
     <div id="map"></div>
 
-    <!-- Leaflet JS dari CDNJS -->
+    <!-- JS Leaflet dari CDNJS Cloudflare -->
     <script src="https://cloudflare.com"></script>
 
     <script>
-        const urlJSON = "https://firebaseio.com";
-
-        // Inisialisasi Peta Leaflet dengan koordinat default awal
+        // 1. Inisialisasi dasar peta (Fokus langsung ke Jakarta sebagai pengujian awal)
+        // Jika koordinat ini berhasil, Leaflet dipastikan bekerja
         const map = L.map('map').setView([-6.2088, 106.8456], 13); 
 
-        // Base layer peta gelap
-        L.tileLayer('https://{s}://{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
+        // 2. MENGGUNAKAN SERVER OPENSTREETMAP STANDAR (Paling aman & pasti muncul)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
 
-        const markers = {};
-
-        async function bacaDanKonversiTeks() {
-            try {
-                const respon = await fetch(`${urlJSON}?nocache=${new Date().getTime()}`);
-                const data = await respon.json();
-                
-                if (data) {
-                    let dataTerkonversi = {};
-                    let adaMarkerBaru = false;
-
-                    Object.keys(data).forEach((idKey) => {
-                        const item = data[idKey];
-                        
-                        let waktuLokal = "Tidak Terdeteksi";
-                        if (item.last_online) {
-                            const ts = parseInt(item.last_online);
-                            waktuLokal = !isNaN(ts) ? new Date(ts).toLocaleString('id-ID') : item.last_online;
-                        }
-
-                        const lat = parseFloat(item.latitude);
-                        const lng = parseFloat(item.longitude);
-
-                        dataTerkonversi[idKey] = {
-                            "latitude": lat,
-                            "longitude": lng,
-                            "waktu_update": waktuLokal
-                        };
-
-                        // Pemetaan Koordinat ke Peta
-                        if (!isNaN(lat) && !isNaN(lng)) {
-                            if (markers[idKey]) {
-                                markers[idKey].setLatLng([lat, lng]);
-                                markers[idKey].getPopup().setContent(`<b>📌 ID: ${idKey}</b><br>Lat: ${lat}<br>Lng: ${lng}<br>Jam: ${waktuLokal}`);
-                            } else {
-                                markers[idKey] = L.marker([lat, lng]).addTo(map)
-                                    .bindPopup(`<b>📌 ID: ${idKey}</b><br>Lat: ${lat}<br>Lng: ${lng}<br>Jam: ${waktuLokal}`);
-                                adaMarkerBaru = true;
-                            }
-                        }
-                    });
-
-                    document.getElementById("output-teks").innerText = JSON.stringify(dataTerkonversi, null, 4);
-
-                    // Peta akan otomatis menyesuaikan fokus (fitBounds) agar semua pendaki terlihat
-                    const markerArray = Object.values(markers);
-                    if (markerArray.length > 0 && (adaMarkerBaru || map.getZoom() === 13)) {
-                        const group = new L.featureGroup(markerArray);
-                        map.fitBounds(group.getBounds().pad(0.2));
-                    }
-
-                } else {
-                    document.getElementById("output-teks").innerText = "Database Terhubung, tetapi kosong.";
-                }
-            } catch (e) {
-                document.getElementById("output-teks").innerText = "Gagal mengambil teks. Periksa Rules Firebase Anda.";
-            }
-        }
-
-        bacaDanKonversiTeks();
-        setInterval(bacaDanKonversiTeks, 3000);
+        // 3. Menambahkan satu penanda (Marker) tiruan untuk tes visual
+        L.marker([-6.2088, 106.8456]).addTo(map)
+            .bindPopup('<b>Peta Berhasil Muncul!</b><br>Jika Anda melihat pesan ini, Leaflet Anda normal.')
+            .openPopup();
     </script>
 
 </body>
