@@ -63,11 +63,11 @@
     <!-- JavaScript Leaflet.js -->
     <script src="https://unpkg.com"></script>
 
-    <!-- Menggunakan Firebase v10 via esm.sh untuk menghindari error CORS -->
-    <script type="module">
-        import { initializeApp } from "https://esm.sh";
-        import { getDatabase, ref, onValue } from "https://esm.sh";
+    <!-- Menggunakan Firebase Versi Kompatibilitas via Cloudflare CDN (Bebas Error CORS & MIME) -->
+    <script src="https://cloudflare.com"></script>
+    <script src="https://cloudflare.com"></script>
 
+    <script>
         // Kredensial Firebase Resmi Proyek Anda
         const firebaseConfig = {
             apiKey: "AIzaSyArmLd5ByLoCm3RwQ_eGbpJIAUdoyM0D5E",
@@ -79,9 +79,9 @@
             appId: "1:315467255779:web:299993f92f6cce31ccdad6"
         };
 
-        // Inisialisasi Firebase
-        const app = initializeApp(firebaseConfig);
-        const database = getDatabase(app);
+        // Inisialisasi Firebase (Format kompatibilitas skrip umum)
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
 
         // Inisialisasi Peta Awal (Titik tengah default diatur ke Indonesia)
         const map = L.map('map').setView([-2.5489, 118.0149], 5);
@@ -89,16 +89,16 @@
         // Load gambar peta grafis dari OpenStreetMap gratis
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
-            attribution: '&copy; <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'
+            attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
 
         // Siapkan variabel kosong untuk Marker (Penanda)
         let pendakiMarker = null;
 
         // Ambil data secara Real-Time dari path /pendaki/id_1
-        const pendakiRef = ref(database, 'pendaki/id_1');
+        const pendakiRef = database.ref('pendaki/id_1');
 
-        onValue(pendakiRef, (snapshot) => {
+        pendakiRef.on('value', (snapshot) => {
             const data = snapshot.val();
             
             // Validasi apakah data koordinat masuk dan tidak kosong
