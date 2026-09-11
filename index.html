@@ -67,34 +67,34 @@
         import { initializeApp } from "https://gstatic.com";
         import { getDatabase, ref, onValue } from "https://gstatic.com";
 
-        // 1. Kredensial Firebase Proyek Anda (Sudah Disesuaikan)
+        // Kredensial Firebase Resmi Proyek Anda
         const firebaseConfig = {
-            apiKey: "AIzaSyArmLd5ByLoCm3RwQ_eGbpJIAUdoyM0D5E", // Ambil dari Project Settings di Firebase Console
-            authDomain: "://firebaseapp.com",
-            databaseURL: "https://firebaseio.com",
+            apiKey: "AIzaSyArmLd5ByLoCm3RwQ_eGbpJIAUdoyM0D5E",
+            authDomain: "digimon-iot-8fe36.firebaseapp.com",
+            databaseURL: "https://digimon-iot-8fe36-default-rtdb.firebaseio.com",
             projectId: "digimon-iot-8fe36",
-            storageBucket: "://appspot.com",
-            messagingSenderId: "338573541481",
-            appId: "1:315467255779:web:299993f92f6cce31ccdad6" // Ambil dari Project Settings di Firebase Console
+            storageBucket: "digimon-iot-8fe36.firebasestorage.app",
+            messagingSenderId: "315467255779",
+            appId: "1:315467255779:web:299993f92f6cce31ccdad6"
         };
 
         // Inisialisasi Firebase
         const app = initializeApp(firebaseConfig);
         const database = getDatabase(app);
 
-        // 2. Inisialisasi Peta Awal (Titik tengah default diatur ke koordinat Indonesia secara umum)
+        // Inisialisasi Peta Awal (Titik tengah default diatur ke Indonesia)
         const map = L.map('map').setView([-2.5489, 118.0149], 5);
 
         // Load gambar peta grafis dari OpenStreetMap gratis
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
-            attribution: '&copy; <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'
+            attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
 
         // Siapkan variabel kosong untuk Marker (Penanda)
         let pendakiMarker = null;
 
-        // 3. Ambil data secara Real-Time dari path /pendaki/id_1
+        // Ambil data secara Real-Time dari path /pendaki/id_1
         const pendakiRef = ref(database, 'pendaki/id_1');
 
         onValue(pendakiRef, (snapshot) => {
@@ -105,7 +105,7 @@
                 const lat = parseFloat(data.latitude);
                 const lng = parseFloat(data.longitude);
                 
-                // Format tanggal Last Online (jika dikirim dalam format angka / timestamp Unix)
+                // Format tanggal Last Online
                 let waktuOnline = "Tidak diketahui";
                 if (data.last_online) {
                     waktuOnline = typeof data.last_online === 'number' 
@@ -135,7 +135,7 @@
                     // Zoom otomatis lebih dekat ke posisi pendaki saat pertama kali terdeteksi
                     map.setView([lat, lng], 15);
                 } else {
-                    // Jika marker sudah ada, geser posisinya secara halus (tanpa membuat duplikat)
+                    // Jika marker sudah ada, geser posisinya secara halus
                     pendakiMarker.setLatLng([lat, lng]);
                     pendakiMarker.setPopupContent(popupContent);
                     
