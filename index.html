@@ -4,33 +4,76 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Peta Monitoring Pendaki Real-Time</title>
+    
+    <!-- CSS Leaflet untuk Peta (Menggunakan CDN Online Resmi) -->
     <link rel="stylesheet" href="https://unpkg.com" />
+    
     <style>
-        html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; font-family: Arial, sans-serif; background-color: #f4f4f4; }
-        #map { width: 100% !important; height: 100vh !important; display: block; }
-        .info-box { position: absolute; top: 15px; right: 15px; background: rgba(255, 255, 255, 0.95); padding: 12px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.25); z-index: 9999; min-width: 200px; }
+        /* Memaksa elemen html dan body mengisi layar penuh tanpa margin */
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+        }
+        /* Memastikan wadah peta memiliki tinggi fisik yang mutlak */
+        #map {
+            width: 100% !important;
+            height: 100vh !important;
+            display: block;
+        }
+        /* Kotak informasi di pojok peta */
+        .info-box {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 12px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+            z-index: 9999; /* Dipastikan melayang paling atas */
+            min-width: 200px;
+        }
         .info-box h3 { margin: 0 0 8px 0; font-size: 14px; color: #222; }
         .info-box p { margin: 4px 0; font-size: 12px; color: #444; }
-        .status-dot { display: inline-block; width: 10px; height: 10px; background-color: #e74c3c; border-radius: 50%; margin-right: 5px; }
-        .status-online { background-color: #2ecc71 !important; }
+        .status-dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background-color: #e74c3c; /* Merah saat offline / mencari sinyal */
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        .status-online {
+            background-color: #2ecc71 !important; /* Hijau saat sukses terkoneksi */
+        }
     </style>
 </head>
 <body>
 
+    <!-- Kotak Informasi Terkini -->
     <div class="info-box">
         <h3><span id="status-light" class="status-dot"></span> Monitoring: ID 1</h3>
-        <p><strong>Latitude:</strong> <span id="txt-lat">Menunggu Firebase...</span></p>
-        <p><strong>Longitude:</strong> <span id="txt-lng">Menunggu Firebase...</span></p>
+        <p><strong>Latitude:</strong> <span id="txt-lat">Menunggu Data...</span></p>
+        <p><strong>Longitude:</strong> <span id="txt-lng">Menunggu Data...</span></p>
         <p><strong>Last Online:</strong> <span id="txt-online">-</span></p>
     </div>
 
+    <!-- Wadah Utama Tempat Peta Berada -->
     <div id="map"></div>
 
+    <!-- JavaScript Peta Leaflet.js -->
     <script src="https://unpkg.com"></script>
-    <script src="https://cloudflare.com"></script>
-    <script src="https://cloudflare.com"></script>
+
+    <!-- Menggunakan CDN Resmi Google Firebase Terpadu (Aman, Stabil & Anti-CORS untuk Seluler) -->
+    <script src="https://gstatic.com"></script>
+    <script src="https://gstatic.com"></script>
 
     <script>
+        // Kredensial Firebase Resmi Proyek Anda
         const firebaseConfig = {
             apiKey: "AIzaSyArmLd5ByLoCm3RwQ_eGbpJIAUdoyM0D5E",
             authDomain: "://firebaseapp.com",
@@ -42,59 +85,83 @@
         };
 
         try {
+            // 1. Inisialisasi Firebase
             firebase.initializeApp(firebaseConfig);
             const database = firebase.database();
 
-            // Peta default mengarah ke lokasi GPS Anda (-6.2088, 106.8456)
+            // 2. Inisialisasi Peta (Dipaksa langsung muncul ke koordinat GPS Anda)
             const map = L.map('map').setView([-6.2088, 106.8456], 13);
 
+            // Memuat gambar grafik peta OpenStreetMap
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 19,
                 attribution: '&copy; OpenStreetMap'
             }).addTo(map);
 
             let pendakiMarker = null;
+
+            // 3. Menghubungkan langsung ke Node Database /pendaki/id_1
             const pendakiRef = database.ref('pendaki/id_1');
 
             pendakiRef.on('value', (snapshot) => {
                 const data = snapshot.val();
                 
                 if (data) {
+                    // Mengonversi paksa data teks koordinat menjadi desimal angka riil
                     const lat = parseFloat(data.latitude);
                     const lng = parseFloat(data.longitude);
                     
+                    // Memvalidasi apakah koordinat yang dikonversi berupa angka sah
                     if (!isNaN(lat) && !isNaN(lng)) {
+                        // Nyalakan lampu indikator menjadi hijau (aktif)
                         document.getElementById('status-light').classList.add('status-online');
                         
+                        // Memformat penulisan Timestamp waktu aktif menjadi Jam Lokal Indonesia
                         let waktuOnline = "Tidak diketahui";
                         if (data.last_online) {
                             const timestamp = parseInt(data.last_online);
-                            waktuOnline = !isNaN(timestamp) ? new Date(timestamp).toLocaleString('id-ID') : data.last_online;
+                            waktuOnline = !isNaN(timestamp) 
+                                ? new Date(timestamp).toLocaleString('id-ID') 
+                                : data.last_online;
                         }
 
+                        // Mengisi nilai koordinat riil ke teks kotak pemantauan HTML
                         document.getElementById('txt-lat').innerText = lat;
                         document.getElementById('txt-lng').innerText = lng;
                         document.getElementById('txt-online').innerText = waktuOnline;
 
+                        const popupContent = `
+                            <div style="font-size:13px; line-height:1.4;">
+                                <b>Pendaki ID_1</b><br>
+                                Status: Terhubung Sinyal<br>
+                                <small>Waktu: ${waktuOnline}</small>
+                            </div>
+                        `;
+
                         if (pendakiMarker === null) {
+                            // Membuat penanda baru di peta
                             pendakiMarker = L.marker([lat, lng]).addTo(map);
-                            pendakiMarker.bindPopup("<b>Pendaki ID_1</b><br>Lokasi Terdeteksi.").openPopup();
+                            pendakiMarker.bindPopup(popupContent).openPopup();
                         } else {
+                            // Menggeser penanda secara otomatis tanpa memuat ulang web
                             pendakiMarker.setLatLng([lat, lng]);
+                            pendakiMarker.setPopupContent(popupContent);
                         }
+                        
+                        // Menyorot kamera peta ke tengah lokasi pendaki berada (Jakarta)
                         map.setView([lat, lng], 15);
                     } else {
-                        alert("Peringatan: Format koordinat di Firebase Anda bukan angka desimal murni!");
+                        alert("Pemberitahuan: Nilai latitude atau longitude di Firebase bukan format angka desimal.");
                     }
                 } else {
-                    alert("Peringatan: Path 'pendaki/id_1' kosong atau tidak ditemukan di Firebase Anda.");
+                    alert("Pemberitahuan: Alamat data 'pendaki/id_1' belum terisi di Firebase.");
                 }
             }, (error) => {
-                alert("Firebase Error: " + error.message + "\nPeriksa kembali tab Rules database Anda.");
+                alert("Akses Firebase Ditolak: " + error.message + "\nPeriksa kembali tab Rules di Firebase Anda.");
             });
 
         } catch (e) {
-            alert("Skrip Error: " + e.message);
+            alert("Terjadi Kendala Skrip: " + e.message);
         }
     </script>
 </body>
