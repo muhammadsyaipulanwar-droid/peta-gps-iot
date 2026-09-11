@@ -3,46 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cek Data Mentah Firebase</title>
+    <title>Uji Coba Ambil Data IoT</title>
 </head>
 <body>
 
-    <h1>Data Mentah Proyek IoT Anda:</h1>
+    <h1>Data Mentah Pengujian Firebase:</h1>
     <hr>
     
-    <!-- Wadah untuk menampilkan seluruh isi database -->
-    <pre id="tampil-data" style="font-size: 16px; background: #eee; padding: 15px; border-radius: 5px;">
-        Sedang menarik data dari Firebase...
+    <!-- Wadah Teks -->
+    <pre id="tampil-data" style="font-size: 16px; background: #eee; padding: 15px; border-radius: 5px; overflow-x: auto;">
+        Mencoba menghubungkan ke server Firebase...
     </pre>
 
     <script>
-        // URL utama database Firebase Anda untuk melihat semua data (.json)
-        const URL_DATABASE = "https://firebaseio.com";
+        // Dua kemungkinan variasi URL Firebase milik Anda
+        const URL_OPSI_A = "https://firebaseio.com";
+        const URL_OPSI_B = "https://firebaseio.com";
 
-        async function ambilSemuaData() {
+        async function mulaiAmbilData() {
+            const wadahTeks = document.getElementById("tampil-data");
+            
+            // --- Percobaan Jalur A ---
             try {
-                // Tambahkan timestamp acak agar browser HP tidak terjebak cache lama
-                const respon = await fetch(`${URL_DATABASE}?nocache=${new Date().getTime()}`);
-                
-                if (!respon.ok) {
-                    throw new Error("Gagal terhubung. Pastikan Rules Firebase sudah di-set ke true.");
+                console.log("Mencoba Jalur A...");
+                const respon = await fetch(`${URL_OPSI_A}?nocache=${new Date().getTime()}`);
+                if (respon.ok) {
+                    const data = await respon.json();
+                    if (data) {
+                        wadahTeks.innerText = "SUKSES LEWAT JALUR A!\n\n" + JSON.stringify(data, null, 2);
+                        return; // Berhenti karena sukses
+                    }
                 }
-                
-                const dataMentah = await respon.json();
-                
-                if (dataMentah === null) {
-                    document.getElementById("tampil-data").innerText = "Database Anda aktif, tetapi isinya kosong (kosong melompong).";
-                } else {
-                    // Mengubah objek database menjadi tulisan rapi (JSON stringify) agar mudah dibaca di layar
-                    document.getElementById("tampil-data").innerText = JSON.stringify(dataMentah, null, 2);
-                }
-            } catch (error) {
-                document.getElementById("tampil-data").innerText = "Error: " + error.message;
+            } catch (e) {
+                console.log("Jalur A gagal, beralih ke Jalur B...");
             }
+
+            // --- Percobaan Jalur B ---
+            try {
+                console.log("Mencoba Jalur B...");
+                const respon = await fetch(`${URL_OPSI_B}?nocache=${new Date().getTime()}`);
+                if (respon.ok) {
+                    const data = await respon.json();
+                    if (data) {
+                        wadahTeks.innerText = "SUKSES LEWAT JALUR B!\n\n" + JSON.stringify(data, null, 2);
+                        return; // Berhenti karena sukses
+                    }
+                }
+            } catch (e) {
+                console.log("Jalur B juga gagal.");
+            }
+
+            // Jika kedua jalur ditolak
+            wadahTeks.innerText = "Error: Kedua jalur URL Firebase ditolak oleh browser Android Anda.\n\n" +
+                                  "Solusi Terakhir:\n" +
+                                  "1. Buka Firebase Console Anda lewat HP.\n" +
+                                  "2. Masuk ke Realtime Database.\n" +
+                                  "3. Salin/copy teks URL persis yang tertera di bagian paling atas database Anda (yang berlogo rantai/link), lalu kirimkan teks URL tersebut ke sini.";
         }
 
-        // Jalankan fungsi pengambilan data
-        ambilSemuaData();
+        // Jalankan pengujian
+        mulaiAmbilData();
     </script>
 
 </body>
