@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Peta Monitoring Pendaki Real-Time</title>
     
+    <!-- CSS Leaflet untuk Peta -->
     <link rel="stylesheet" href="https://unpkg.com" />
     
     <style>
@@ -50,80 +51,82 @@
 </head>
 <body>
 
+    <!-- Kotak Informasi Pemantauan -->
     <div class="info-box">
         <h3><span id="status-light" class="status-dot"></span> Monitoring: ID 1</h3>
-        <p><strong>Latitude:</strong> <span id="txt-lat">Menunggu Data...</span></p>
-        <p><strong>Longitude:</strong> <span id="txt-lng">Menunggu Data...</span></p>
+        <p><strong>Latitude:</strong> <span id="txt-lat">Menghubungkan...</span></p>
+        <p><strong>Longitude:</strong> <span id="txt-lng">Menghubungkan...</span></p>
         <p><strong>Last Online:</strong> <span id="txt-online">-</span></p>
     </div>
 
+    <!-- Wadah Utama Peta -->
     <div id="map"></div>
 
+    <!-- JS Leaflet (Hanya pustaka ini yang dimuat, sangat ringan) -->
     <script src="https://unpkg.com"></script>
 
-    <!-- Menggunakan jsDelivr CDN untuk stabilitas maksimal di Android -->
-    <script src="https://jsdelivr.net"></script>
-    <script src="https://jsdelivr.net"></script>
-
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyArmLd5ByLoCm3RwQ_eGbpJIAUdoyM0D5E",
-            authDomain: "://firebaseapp.com",
-            databaseURL: "https://firebaseio.com",
-            projectId: "digimon-iot-8fe36",
-            storageBucket: "digimon-iot-8fe36.firebasestorage.app",
-            messagingSenderId: "315467255779",
-            appId: "1:315467255779:web:299993f92f6cce31ccdad6"
-        };
+        // 1. Inisialisasi Peta Leaflet secara instan
+        const map = L.map('map').setView([-6.2088, 106.8456], 13);
 
-        try {
-            firebase.initializeApp(firebaseConfig);
-            const database = firebase.database();
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap'
+        }).addTo(map);
 
-            const map = L.map('map').setView([-6.2088, 106.8456], 13);
+        let pendakiMarker = null;
 
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 19,
-                attribution: '&copy; OpenStreetMap'
-            }).addTo(map);
+        // URL REST API Firebase Langsung ke Path Pendaki Anda
+        const firebaseURL = "https://firebaseio.com";
 
-            let pendakiMarker = null;
-            const pendakiRef = database.ref('pendaki/id_1');
-
-            pendakiRef.on('value', (snapshot) => {
-                const data = snapshot.val();
+        // 2. Fungsi Mengambil Data dari Firebase (Metode HTTP Fetch)
+        async function ambilDataFirebase() {
+            try {
+                const response = await fetch(firebaseURL);
+                if (!response.ok) throw new Error("Gagal merespons server");
+                
+                const data = await response.json();
                 
                 if (data) {
                     const lat = parseFloat(data.latitude);
                     const lng = parseFloat(data.longitude);
                     
                     if (!isNaN(lat) && !isNaN(lng)) {
+                        // Indikator sukses terhubung
                         document.getElementById('status-light').classList.add('status-online');
                         
+                        // Format waktu online
                         let waktuOnline = "Tidak diketahui";
                         if (data.last_online) {
                             const timestamp = parseInt(data.last_online);
                             waktuOnline = !isNaN(timestamp) ? new Date(timestamp).toLocaleString('id-ID') : data.last_online;
                         }
 
+                        // Tampilkan teks ke layar HP
                         document.getElementById('txt-lat').innerText = lat;
                         document.getElementById('txt-lng').innerText = lng;
                         document.getElementById('txt-online').innerText = waktuOnline;
 
+                        // Perbarui Posisi Marker di Peta
                         if (pendakiMarker === null) {
                             pendakiMarker = L.marker([lat, lng]).addTo(map);
-                            pendakiMarker.bindPopup("<b>Pendaki ID_1</b><br>Terhubung").openPopup();
+                            pendakiMarker.bindPopup("<b>Pendaki ID_1</b><br>Lokasi Aktif.").openPopup();
+                            map.setView([lat, lng], 15); // Auto center pertama kali
                         } else {
                             pendakiMarker.setLatLng([lat, lng]);
                         }
-                        map.setView([lat, lng], 15);
                     }
                 }
-            });
-
-        } catch (e) {
-            alert("Kendala: " + e.message);
+            } catch (error) {
+                console.error("Terjadi kesalahan ambil data:", error.message);
+                document.getElementById('txt-lat').innerText = "Koneksi Bermasalah";
+            }
         }
+
+        // 3. Sistem Pengulangan Otomatis (Mengambil data setiap 3 detik sebagai pengganti real-time stream)
+        ambilDataFirebase(); // Jalankan pertama kali saat web dibuka
+        setInterval(ambilDataFirebase, 3000); 
     </script>
 </body>
 </html>
+
