@@ -3,98 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Peta Monitoring Pendaki Real-Time</title>
-    
-    <!-- CSS Peta Leaflet -->
-    <link rel="stylesheet" href="https://unpkg.com" />
-    
-    <style>
-        html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; font-family: Arial, sans-serif; }
-        #map { width: 100% !important; height: 100vh !important; display: block; }
-        .info-box {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 12px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-            z-index: 9999;
-            min-width: 200px;
-        }
-        .info-box h3 { margin: 0 0 8px 0; font-size: 14px; color: #222; }
-        .info-box p { margin: 4px 0; font-size: 12px; color: #444; }
-        .status-dot { display: inline-block; width: 10px; height: 10px; background-color: #e74c3c; border-radius: 50%; margin-right: 5px; }
-        .status-online { background-color: #2ecc71 !important; }
-    </style>
+    <title>Teks Monitor Firebase</title>
 </head>
-<body>
+<body style="font-family: monospace; padding: 20px; background: #222; color: #00ff00;">
 
-    <div class="info-box">
-        <h3><span id="status-light" class="status-dot"></span> Monitoring: ID 1</h3>
-        <p><strong>Latitude:</strong> <span id="txt-lat">Menghubungkan...</span></p>
-        <p><strong>Longitude:</strong> <span id="txt-lng">Menghubungkan...</span></p>
-        <p><strong>Waktu Update:</strong> <span id="txt-online">-</span></p>
-    </div>
-
-    <div id="map"></div>
-
-    <!-- Pustaka Peta Ringan -->
-    <script src="https://unpkg.com"></script>
+    <h2>[ LIVE DATA MONITOR ]</h2>
+    <hr style="border-color: #00ff00;">
+    
+    <!-- Wadah Teks Hijau seperti layar komputer server -->
+    <pre id="output-teks" style="font-size: 16px; white-space: pre-wrap;">Memanggil data IoT...</pre>
 
     <script>
-        // Inisialisasi Peta (Default Jakarta)
-        const map = L.map('map').setView([-6.2088, 106.8456], 13);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
-        let pendakiMarker = null;
+        // URL akses publik database Anda
+        const urlJSON = "https://firebaseio.com";
 
-        // URL REST API Firebase Publik (Ekstensi .json wajib di ujung)
-        const firebaseURL = "https://digimon-iot-8fe36-default-rtdb.firebaseio.com/pendaki/id_1";
-
-        async function perbaruiPetaDariFirebase() {
+        async function bacaDataTeks() {
             try {
-                // Menambahkan tanda waktu acak (?cache=...) agar browser Android tidak terjebak cache lama
-                const respon = await fetch(`${firebaseURL}?cache=${new Date().getTime()}`);
+                // Bypass cache agar teks selalu ter-update otomatis tiap detik
+                const respon = await fetch(`${urlJSON}?nocache=${new Date().getTime()}`);
                 const data = await respon.json();
                 
                 if (data) {
-                    const lat = parseFloat(data.latitude);
-                    const lng = parseFloat(data.longitude);
-                    
-                    if (!isNaN(lat) && !isNaN(lng)) {
-                        // Ubah lampu indikator menjadi hijau (sukses)
-                        document.getElementById('status-light').classList.add('status-online');
-                        
-                        // Konversi server timestamp dari ESP32 Anda menjadi Jam lokal WIB/WITA secara otomatis di web
-                        let waktuOnline = "-";
-                        if (data.last_online) {
-                            const ts = parseInt(data.last_online);
-                            waktuOnline = !isNaN(ts) ? new Date(ts).toLocaleString('id-ID') : data.last_online;
-                        }
-
-                        // Update isi teks di layar
-                        document.getElementById('txt-lat').innerText = lat;
-                        document.getElementById('txt-lng').innerText = lng;
-                        document.getElementById('txt-online').innerText = waktuOnline;
-
-                        // Geser posisi penanda di peta secara halus
-                        if (pendakiMarker === null) {
-                            pendakiMarker = L.marker([lat, lng]).addTo(map);
-                            pendakiMarker.bindPopup("<b>Pendaki ID_1</b><br>Lokasi Terpantau Online.").openPopup();
-                            map.setView([lat, lng], 15);
-                        } else {
-                            pendakiMarker.setLatLng([lat, lng]);
-                        }
-                    }
+                    // Cetak semua data ke layar dalam bentuk string teks rapi
+                    document.getElementById("output-teks").innerText = JSON.stringify(data, null, 4);
+                } else {
+                    document.getElementById("output-teks").innerText = "Database Terhubung, tetapi kosong.";
                 }
-            } catch (error) {
-                console.log("Koneksi dibatasi browser.");
+            } catch (e) {
+                document.getElementById("output-teks").innerText = "Gagal mengambil teks. Pastikan Rules Firebase Anda sudah diset ke true.";
             }
         }
 
-        // Cek data ke Firebase secara otomatis setiap 4 detik sekali
-        perbaruiPetaDariFirebase();
-        setInterval(perbaruiPetaDariFirebase, 4000);
+        // Cek data otomatis setiap 3 detik sekali
+        bacaDataTeks();
+        setInterval(bacaDataTeks, 3000);
     </script>
+
 </body>
 </html>
