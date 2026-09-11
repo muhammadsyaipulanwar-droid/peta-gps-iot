@@ -1,166 +1,100 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Realtime Monitoring GPS Pendaki (Secure Key)</title>
-
-    <!-- Bootstrap CSS Online -->
-    <link href="https://bootstrapcdn.com" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Peta Monitoring Pendaki Real-Time</title>
     
-    <!-- Leaflet CSS untuk Peta -->
+    <!-- CSS Peta Leaflet -->
     <link rel="stylesheet" href="https://unpkg.com" />
-
+    
     <style>
-        body { padding-top: 20px; background-color: #f5f5f5; }
-        .well { background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); font-size: 16px; font-weight: bold; }
-        h1 { font-weight: bold; color: #2c3e50; }
-        #map {
-            width: 100%;
-            height: 400px;
-            border-radius: 6px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.15);
-            margin-top: 15px;
-            margin-bottom: 20px;
+        html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; font-family: Arial, sans-serif; }
+        #map { width: 100% !important; height: 100vh !important; display: block; }
+        .info-box {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 12px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+            z-index: 9999;
+            min-width: 200px;
         }
-        latitude, longitude, jam { font-weight: bold; color: #2980b9; font-size: 18px; }
+        .info-box h3 { margin: 0 0 8px 0; font-size: 14px; color: #222; }
+        .info-box p { margin: 4px 0; font-size: 12px; color: #444; }
+        .status-dot { display: inline-block; width: 10px; height: 10px; background-color: #e74c3c; border-radius: 50%; margin-right: 5px; }
+        .status-online { background-color: #2ecc71 !important; }
     </style>
 </head>
 <body>
 
-    <!-- Header Judul Terpusat Bootstrap -->
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-6 col-md-offset-3">
-                <h1 class="text-center">Realtime Monitoring GPS Using Firebase</h1>
-            </div>
-        </div>
-        <hr>
+    <div class="info-box">
+        <h3><span id="status-light" class="status-dot"></span> Monitoring: ID 1</h3>
+        <p><strong>Latitude:</strong> <span id="txt-lat">Menghubungkan...</span></p>
+        <p><strong>Longitude:</strong> <span id="txt-lng">Menghubungkan...</span></p>
+        <p><strong>Waktu Update:</strong> <span id="txt-online">-</span></p>
     </div>
 
-    <!-- Konten Pemantauan Koordinat -->
-    <div class="container">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="well">
-                    <!-- Menggunakan struktur Tag Kustom format Anda -->
-                    Latitude : <latitude>Menunggu Firebase...</latitude>
-                    <hr>
-                    Longitude : <longitude>Menunggu Firebase...</longitude>
-                    <hr>
-                    Jam Sistem HP : <jam>00:00:00</jam>
-                </div>
-            </div>
-        </div>
+    <div id="map"></div>
 
-        <!-- Tempat Peta -->
-        <div class="row">
-            <div class="col-md-12">
-                <div id="map"></div>
-            </div>
-        </div>
-
-        <!-- Footer -->
-        <hr>
-        <div class="row">
-            <div class="text-center col-md-6 col-md-offset-3">
-                <h4>Footer Monitoring</h4>
-                <p>Copyright © 2026 · All Rights Reserved · <a href="#">My IoT Website</a></p>
-            </div>
-        </div>
-        <hr>
-    </div>
-
-    <!-- Pustaka JS Dasar -->
-    <script src="https://googleapis.com"></script>
-    <script src="https://bootstrapcdn.com"></script>
+    <!-- Pustaka Peta Ringan -->
     <script src="https://unpkg.com"></script>
 
-    <!-- Memuat Firebase SDK Versi 8 Kompatibilitas Tinggi (Wajib Pakai Key & Bebas Error Seluler) -->
-    <script src="https://gstatic.com"></script>
-    <script src="https://gstatic.com"></script>
-
     <script>
-        // 1. Deklarasi Elemen Tag Kustom
-        var a = document.querySelector('latitude'); 
-        var b = document.querySelector('longitude'); 
-        var c = document.querySelector('jam');
+        // Inisialisasi Peta (Default Jakarta)
+        const map = L.map('map').setView([-6.2088, 106.8456], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+        let pendakiMarker = null;
 
-        // 2. Logika Jam Sistem HP (Fungsi Bawaan Anda)
-        var pad = function(x){
-            return x < 10 ? '0' + x : x;
-        }
-        var showclock = function(){
-            var e = new Date();
-            var h = pad(e.getHours());
-            var m = pad(e.getMinutes());
-            var s = pad(e.getSeconds()); 
-            c.innerHTML = [h, m, s].join(':');
-        }
-        setInterval(showclock, 1000);
+        // URL REST API Firebase Publik (Ekstensi .json wajib di ujung)
+        const firebaseURL = "https://firebaseio.com";
 
-        // 3. Inisialisasi Peta Awal (Fokus default Jakarta)
-        var map = L.map('map').setView([-6.2088, 106.8456], 13);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap contributors'
-        }).addTo(map);
-        
-        var pendakiMarker = null;
-
-        // 4. Kredensial Firebase RESMI & LENGKAP Milik Proyek Anda
-        var config = {
-            apiKey: "AIzaSyArmLd5ByLoCm3RwQ_eGbpJIAUdoyM0D5E",
-            authDomain: "://firebaseapp.com",
-            databaseURL: "https://firebaseio.com",
-            projectId: "digimon-iot-8fe36",
-            storageBucket: "digimon-iot-8fe36.firebasestorage.app",
-            messagingSenderId: "315467255779",
-            appId: "1:315467255779:web:299993f92f6cce31ccdad6"
-        };
-        
-        // Mengaktifkan koneksi Firebase menggunakan konfigurasi Key di atas
-        firebase.initializeApp(config);
-        var database = firebase.database();
-
-        // 5. Menembak target ke Jalur Data: /pendaki/id_1
-        var myRef = database.ref('pendaki/id_1');
-
-        // Mendengarkan data masuk secara Real-Time sejati (.on value)
-        myRef.on('value', function(snapshot){
-            var data = snapshot.val();
-            
-            if(data) {
-                var lat = parseFloat(data.latitude);
-                var lng = parseFloat(data.longitude);
-
-                if(!isNaN(lat) && !isNaN(lng)) {
-                    // Update teks koordinat ke dalam tag kustom di layar
-                    a.innerHTML = lat;
-                    b.innerHTML = lng;
-
-                    // Plotting posisi penanda di atas peta
-                    if (pendakiMarker === null) {
-                        pendakiMarker = L.marker([lat, lng]).addTo(map);
-                        pendakiMarker.bindPopup("<b>Pendaki ID_1</b><br>Terkunci via Secure Key.").openPopup();
-                    } else {
-                        pendakiMarker.setLatLng([lat, lng]);
-                    }
+        async function perbaruiPetaDariFirebase() {
+            try {
+                // Menambahkan tanda waktu acak (?cache=...) agar browser Android tidak terjebak cache lama
+                const respon = await fetch(`${firebaseURL}?cache=${new Date().getTime()}`);
+                const data = await respon.json();
+                
+                if (data) {
+                    const lat = parseFloat(data.latitude);
+                    const lng = parseFloat(data.longitude);
                     
-                    // Kamera peta otomatis bergeser memfokuskan objek
-                    map.setView([lat, lng], 15);
-                } else {
-                    a.innerHTML = "Format Data Koordinat Bukan Angka!";
-                    b.innerHTML = "Format Data Koordinat Bukan Angka!";
+                    if (!isNaN(lat) && !isNaN(lng)) {
+                        // Ubah lampu indikator menjadi hijau (sukses)
+                        document.getElementById('status-light').classList.add('status-online');
+                        
+                        // Konversi server timestamp dari ESP32 Anda menjadi Jam lokal WIB/WITA secara otomatis di web
+                        let waktuOnline = "-";
+                        if (data.last_online) {
+                            const ts = parseInt(data.last_online);
+                            waktuOnline = !isNaN(ts) ? new Date(ts).toLocaleString('id-ID') : data.last_online;
+                        }
+
+                        // Update isi teks di layar
+                        document.getElementById('txt-lat').innerText = lat;
+                        document.getElementById('txt-lng').innerText = lng;
+                        document.getElementById('txt-online').innerText = waktuOnline;
+
+                        // Geser posisi penanda di peta secara halus
+                        if (pendakiMarker === null) {
+                            pendakiMarker = L.marker([lat, lng]).addTo(map);
+                            pendakiMarker.bindPopup("<b>Pendaki ID_1</b><br>Lokasi Terpantau Online.").openPopup();
+                            map.setView([lat, lng], 15);
+                        } else {
+                            pendakiMarker.setLatLng([lat, lng]);
+                        }
+                    }
                 }
-            } else {
-                a.innerHTML = "Data Path Kosong (Null)";
-                b.innerHTML = "Data Path Kosong (Null)";
+            } catch (error) {
+                console.log("Koneksi dibatasi browser.");
             }
-        }, function(errorObject) {
-            a.innerHTML = "Akses Ditolak Firebase: " + errorObject.code;
-            b.innerHTML = "Periksa kembali aturan tab Rules di Firebase Console.";
-        });
+        }
+
+        // Cek data ke Firebase secara otomatis setiap 4 detik sekali
+        perbaruiPetaDariFirebase();
+        setInterval(perbaruiPetaDariFirebase, 4000);
     </script>
 </body>
 </html>
