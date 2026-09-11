@@ -3,51 +3,155 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teks Monitor Firebase Terkonversi</title>
-</head>
-<body style="font-family: monospace; padding: 20px; background: #222; color: #00ff00;">
-
-    <h2>[ LIVE DATA MONITOR ]</h2>
-    <hr style="border-color: #00ff00;">
+    <title>Visual GPS Monitor - Firebase IoT</title>
     
-    <!-- Wadah Teks Hijau Server -->
-    <pre id="output-teks" style="font-size: 16px; white-space: pre-wrap; line-height: 1.5;">Memanggil data IoT...</pre>
+    <!-- Leaflet CSS untuk Peta Visual -->
+    <link rel="stylesheet" href="https://unpkg.com" />
+    
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            display: flex;
+            height: 100vh;
+            font-family: monospace;
+            background: #222;
+            color: #00ff00;
+            overflow: hidden;
+        }
+        
+        /* Panel Kiri: Terminal Log Teks (Menggunakan kode asli Anda) */
+        #panel-log {
+            width: 350px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            border-right: 2px solid #00ff00;
+            background: #111;
+            overflow-y: auto;
+        }
+        #output-teks {
+            font-size: 13px;
+            white-space: pre-wrap;
+            line-height: 1.4;
+            color: #00ff00;
+            margin-top: 15px;
+        }
+
+        /* Panel Kanan: Wadah Peta Visual */
+        #map {
+            flex: 1;
+            height: 100%;
+            background: #333;
+        }
+
+        /* Modifikasi pop-up Leaflet agar serasi dengan tema gelap/terminal */
+        .leaflet-popup-content-wrapper {
+            background: #222;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            font-family: monospace;
+            border-radius: 4px;
+        }
+        .leaflet-popup-tip {
+            background: #222;
+            border: 1px solid #00ff00;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- PANEL LOG TEKS (KODE ASLI ANDA) -->
+    <div id="panel-log">
+        <h2>[ LIVE DATA MONITOR ]</h2>
+        <p style="font-size: 11px; color: #888;">Firebase Fetch -> Real-time Map</p>
+        <hr style="border-color: #00ff00; margin-top: 10px;">
+        <pre id="output-teks">Memanggil data IoT & Peta...</pre>
+    </div>
+
+    <!-- PANEL PETA VISUAL (LEAFLET MAP) -->
+    <div id="map"></div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com"></script>
 
     <script>
-        // URL akses publik database Anda yang terbukti sukses
+        // URL akses publik database Anda yang sukses
         const urlJSON = "https://digimon-iot-8fe36-default-rtdb.firebaseio.com/pendaki.json";
+
+        // 1. Inisialisasi Peta Leaflet (Fokus awal ke Indonesia secara global)
+        const map = L.map('map').setView([-6.2088, 106.8456], 13); 
+
+        // Menggunakan Peta Gelap (CartoDB Dark Matter) agar serasi dengan tema terminal hijau Anda
+        L.tileLayer('https://{s}://{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
+        }).addTo(map);
+
+        // Objek untuk menampung marker peta pendaki agar tidak duplikat saat refresh
+        const markers = {};
 
         async function bacaDanKonversiTeks() {
             try {
-                // Bypass cache agar teks selalu ter-update otomatis tiap 3 detik
+                // Bypass cache otomatis tiap 3 detik (Sesuai kode asli Anda)
                 const respon = await fetch(`${urlJSON}?nocache=${new Date().getTime()}`);
                 const data = await respon.json();
                 
                 if (data) {
-                    // Membuat objek salinan untuk memodifikasi tampilan waktu tanpa merusak data asli
                     let dataTerkonversi = {};
 
-                    // Melakukan perulangan otomatis membaca id_1, id_2, dst.
                     Object.keys(data).forEach((idKey) => {
                         const item = data[idKey];
                         
-                        // Ambil dan konversi otomatis server timestamp menjadi format Jam Tanggal Indonesia
+                        // Konversi manual server timestamp (Sesuai kode asli Anda)
                         let waktuLokal = "Tidak Terdeteksi";
                         if (item.last_online) {
                             const ts = parseInt(item.last_online);
                             waktuLokal = !isNaN(ts) ? new Date(ts).toLocaleString('id-ID') : item.last_online;
                         }
 
-                        // Masukkan ke struktur teks baru yang bersih
+                        // Mengonversi koordinat string/float dari database
+                        const lat = parseFloat(item.latitude);
+                        const lng = parseFloat(item.longitude);
+
+                        // Masukkan ke struktur teks log terminal
                         dataTerkonversi[idKey] = {
-                            "latitude": parseFloat(item.latitude),
-                            "longitude": parseFloat(item.longitude),
+                            "latitude": lat,
+                            "longitude": lng,
                             "waktu_update": waktuLokal
                         };
+
+                        // 2. PEMETAAN VISUAL PADA LEAFLET MAP
+                        // Jalankan pemetaan hanya jika koordinat numeriknya valid
+                        if (!isNaN(lat) && !isNaN(lng)) {
+                            if (markers[idKey]) {
+                                // Jika marker pendaki sudah terdaftar, perbarui posisinya saja
+                                markers[idKey].setLatLng([lat, lng]);
+                                markers[idKey].getPopup().setContent(`<b>📌 ID: ${idKey}</b><br>Lat: ${lat}<br>Lng: ${lng}<br>Jam: ${waktuLokal}`);
+                            } else {
+                                // Jika pendaki baru pertama kali terbaca, buat marker baru
+                                markers[idKey] = L.marker([lat, lng]).addTo(map)
+                                    .bindPopup(`<b>📌 ID: ${idKey}</b><br>Lat: ${lat}<br>Lng: ${lng}<br>Jam: ${waktuLokal}`);
+                            }
+                        }
                     });
 
-                    // Cetak seluruh hasil struktur teks ke layar HP Android Anda dengan rapi
+                    // Tampilkan struktur JSON terkonversi ke panel log kiri (Sesuai kode asli Anda)
                     document.getElementById("output-teks").innerText = JSON.stringify(dataTerkonversi, null, 4);
+
+                    // 3. AUTO-FOCUS/AUTO-ZOOM PETA
+                    // Secara otomatis memposisikan peta di tengah-tengah kumpulan seluruh pendaki yang aktif
+                    const markerArray = Object.values(markers);
+                    if (markerArray.length > 0) {
+                        const group = new L.featureGroup(markerArray);
+                        // Fit bounds dijalankan pada tarikan data pertama kali atau saat posisi melompat jauh
+                        if (map.getZoom() === 13) {
+                            map.fitBounds(group.getBounds().pad(0.2));
+                        }
+                    }
+
                 } else {
                     document.getElementById("output-teks").innerText = "Database Terhubung, tetapi kosong.";
                 }
@@ -56,7 +160,7 @@
             }
         }
 
-        // Jalankan pengecekan data otomatis setiap 3 detik sekali secara real-time
+        // Eksekusi real-time interval 3 detik
         bacaDanKonversiTeks();
         setInterval(bacaDanKonversiTeks, 3000);
     </script>
