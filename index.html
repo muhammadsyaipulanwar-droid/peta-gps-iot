@@ -3,129 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Visual GPS Monitor - Firebase IoT</title>
+    <title>Peta Leaflet Saja</title>
+    
+    <!-- 1. CSS LEAFLET RESMI DARI CDN CLOUDFLARE -->
+    <link rel="stylesheet" href="https://cloudflare.com" integrity="sha512-Zcn693ZgPn7cAaALVov3zUv+2C6G9pUtdXfFA5Ipx0AecDDFBvHshq0mN4l+qWpB13uV8HlW+xN/1UeC09Kng==" crossorigin="" />
     
     <style>
-        /* CSS Dasar Peta Tersemat Aman */
-        .leaflet-pane,.leaflet-tile,.leaflet-marker-icon,.leaflet-marker-shadow,.leaflet-tile-container,.leaflet-pane>svg,.leaflet-pane>canvas,.leaflet-zoom-box,.leaflet-image-layer,.leaflet-layer{position:absolute;left:0;top:0}.leaflet-container{overflow:hidden;-webkit-tap-highlight-color:transparent}.leaflet-tile,.leaflet-marker-icon,.leaflet-marker-shadow{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;-webkit-user-drag:none}.leaflet-tile{filter:inherit;visibility:hidden}.leaflet-tile-loaded{visibility:inherit}.leaflet-zoom-box{width:0;height:0;-moz-box-sizing:border-box;box-sizing:border-box;z-index:800}.leaflet-pane{z-index:400}.leaflet-tile-pane{z-index:200}.leaflet-overlay-pane{z-index:400}.leaflet-shadow-pane{z-index:500}.leaflet-marker-pane{z-index:600}.leaflet-tooltip-pane{z-index:650}.leaflet-popup-pane{z-index:700}.leaflet-map-pane canvas{z-index:100}.leaflet-map-pane svg{z-index:200}.leaflet-control{position:relative;z-index:800;pointer-events:auto}.leaflet-top,.leaflet-bottom{position:absolute;z-index:1000;pointer-events:none}.leaflet-top{top:0}.leaflet-right{right:0}.leaflet-bottom{bottom:0}.leaflet-left{left:0}.leaflet-control{float:left;clear:both}.leaflet-right .leaflet-control{float:right}.leaflet-top .leaflet-control{margin-top:10px}.leaflet-bottom .leaflet-control{margin-bottom:10px}.leaflet-left .leaflet-control{margin-left:10px}.leaflet-right .leaflet-control{margin-right:10px}.leaflet-popup{position:absolute;text-align:center;margin-bottom:20px}.leaflet-popup-content-wrapper{padding:1px;text-align:left;border-radius:4px;background:#222;color:#00ff00;border:1px solid #00ff00;box-shadow:0 3px 14px rgba(0,0,0,0.4);font-family:monospace}.leaflet-popup-content{margin:10px;line-height:1.4;font-size:12px;min-width:50px}.leaflet-popup-tip-container{width:40px;height:20px;position:absolute;left:50%;margin-left:-20px;overflow:hidden;pointer-events:none}.leaflet-popup-tip{width:17px;height:17px;padding:1px;margin:-10px auto 0;transform:rotate(45deg);background:#222;border:1px solid #00ff00;box-shadow:0 3px 14px rgba(0,0,0,0.4)}
-        
-        /* Layout Pembagian Layar */
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            display: flex;
-            height: 100vh;
-            font-family: monospace;
-            background: #222;
-            color: #00ff00;
-            overflow: hidden;
+        /* Memaksa peta memenuhi seluruh layar HP / Komputer */
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #1a1a1a; /* Latar belakang gelap */
         }
-        
-        /* Sisi Kiri: Log Teks Hijau Asli Anda */
-        #panel-log {
-            width: 360px;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            border-right: 2px solid #00ff00;
-            background: #111;
-            overflow-y: auto;
-            height: 100vh;
-        }
-        #output-teks {
-            font-size: 13px;
-            white-space: pre-wrap;
-            line-height: 1.4;
-            color: #00ff00;
-            margin-top: 15px;
-        }
-
-        /* Sisi Kanan: Kontainer Peta */
         #map {
-            flex: 1;
+            width: 100vw;
             height: 100vh;
-            background: #333;
+            display: block;
         }
     </style>
 </head>
 <body>
 
-    <!-- PANEL LOG TEKS ASLI ANDA -->
-    <div id="panel-log">
-        <h2>[ LIVE DATA MONITOR ]</h2>
-        <p style="font-size: 11px; color: #888;">Firebase Fetch -> Real-time Map</p>
-        <hr style="border-color: #00ff00; margin-top: 10px;">
-        <pre id="output-teks">Menghubungkan ke IoT & Peta...</pre>
-    </div>
-
-    <!-- PANEL PETA VISUAL -->
+    <!-- Wadah Tunggal Peta -->
     <div id="map"></div>
 
-    <!-- ENGINE INTERNAL LEAFLET (Anti-Blockir / Anti-Error) -->
+    <!-- 2. JAVASCRIPT LEAFLET RESMI DARI CDN CLOUDFLARE -->
+    <script src="https://cloudflare.com" integrity="sha512-Bw3bT6yA6zS6fEFE2C7H5/H5eF72u1/A4T/tW48z03vE14AecM3c7N7EfaP1B4mZUp7Gf5D7U1B8vH5O0RzNlw==" crossorigin=""></script>
+
     <script>
-        !function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"define"==typeof define&&define.amd?define(["exports"],e):e((t="undefined"!=typeof globalThis?globalThis:t||self).L={})}(this,(function(t){"use strict";var LeafletLite=function(){function t(t,e){this.options=e||{},this._container=document.getElementById(t),this._initLayout()}return t.prototype._initLayout=function(){this._container.innerHTML="<div class='leaflet-pane' style='width:100%;height:100%;position:relative;background:#333;' id='map-canvas'></div>"},t.prototype.setView=function(t,e){return this.coords=t,this.zoom=e,this},t.prototype.fitBounds=function(t){},t;}(),TileLayerLite=function(){function t(t,e){this.url=t,this.options=e||{}}return t.prototype.addTo=function(t){var e=document.getElementById("map-canvas");if(e&&!document.getElementById("osm-tile")){var i=document.createElement("div");i.id="osm-tile",i.style.position="absolute",i.style.width="100%",i.style.height="100%",i.style.background="url('https://openstreetmap.org') center no-repeat",i.style.backgroundSize="cover",i.style.opacity="0.3",i.style.filter="invert(1) hue-rotate(180deg)",e.appendChild(i)}return this},t;}(),MarkerLite=function(){function t(t,e){this.coords=t,this.options=e||{},this._initDOM()}return t.prototype._initDOM=function(){var t=document.getElementById("map-canvas");if(t){this.el=document.createElement("div"),this.el.style.position="absolute",this.el.style.width="14px",this.el.style.height="14px",this.el.style.background="#00ff00",this.el.style.borderRadius="50%",this.el.style.border="2px solid #fff",this.el.style.boxShadow="0 0 8px #00ff00",this.el.style.cursor="pointer",this.el.style.transform="translate(-50%, -50%)";var e=Math.random()*60+20,i=Math.random()*60+20;this.el.style.left=e+"%",this.el.style.top=i+"%",t.appendChild(this.el)}},t.prototype.setLatLng=function(t){this.coords=t;return this},t.prototype.bindPopup=function(t){var e=this;return this.popupText=t,this.el&&(this.el.onclick=function(i){var n=document.getElementById("custom-popup");n||((n=document.createElement("div")).id="custom-popup",n.className="leaflet-popup",n.style.zIndex="1000",n.style.transform="translate(-50%, -120%)",document.getElementById("map-canvas").appendChild(n)),n.style.left=e.el.style.left,n.style.top=e.el.style.top,n.innerHTML="<div class='leaflet-popup-content-wrapper'><div class='leaflet-popup-content'>"+t+"</div></div>"}),this},t.prototype.getPopup=function(){var t=this;return{setContent:function(e){t.popupText=e;var i=document.getElementById("custom-popup");i&&i.style.left===t.el.style.left&&(i.innerHTML="<div class='leaflet-popup-content-wrapper'><div class='leaflet-popup-content'>"+e+"</div></div>")}}},t;}(),FeatureGroupLite=function(t){this.markers=t||[]};t.map=function(t,e){return new LeafletLite(t,e)},t.tileLayer=function(t,e){return new TileLayerLite(t,e)},t.marker=function(t,e){return new MarkerLite(t,e)},t.featureGroup=function(t){return new FeatureGroupLite(t)}}));
+        // Menunggu seluruh elemen halaman siap
+        window.addEventListener('DOMContentLoaded', () => {
+            try {
+                // 3. Inisialisasi peta (Fokus awal ke koordinat Jakarta)
+                const map = L.map('map').setView([-6.2088, 106.8456], 11);
+
+                // 4. Memuat Gambar Peta dari OpenStreetMap
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                    attribution: '&copy; OpenStreetMap'
+                }).addTo(map);
+
+                // 5. PILIHAN DARURAT: Jika gambar peta internet diblokir,
+                // baris di bawah ini akan menggambar garis kotak koordinat abu-abu di layar Anda.
+                L.gridLayer({
+                    attribution: 'Grid Darurat Aktif'
+                }).createTile = function(coords) {
+                    var tile = document.createElement('div');
+                    tile.style.outline = '1px solid rgba(255,255,255,0.2)';
+                    tile.style.color = '#00ff00';
+                    tile.style.fontFamily = 'monospace';
+                    tile.style.fontSize = '10px';
+                    tile.style.padding = '5px';
+                    tile.innerHTML = 'X:' + coords.x + ', Y:' + coords.y + ', Z:' + coords.z;
+                    return tile;
+                };
+                map.addLayer(L.gridLayer());
+
+                // 6. Menaruh pin penanda di tengah layar
+                L.marker([-6.2088, 106.8456]).addTo(map)
+                    .bindPopup('<b>Sistem Peta Aktif!</b><br>Koordinat: -6.2088, 106.8456')
+                    .openPopup();
+
+                // Memaksa render ulang ukuran agar pas dengan layar browser
+                setTimeout(() => {
+                    map.invalidateSize();
+                }, 300);
+
+            } catch (error) {
+                // Menampilkan kotak pesan jika ada kode script yang macet
+                alert("Gagal memicu Leaflet: " + error.message);
+            }
+        });
     </script>
 
-    <!-- CORE LOGIKA UTAMA -->
-    <script>
-        // URL akses publik database Anda yang terbukti sukses
-        const urlJSON = "https://firebaseio.com";
-
-        // Inisialisasi Peta Aman
-        const map = L.map('map').setView([-6.2088, 106.8456], 13);
-        L.tileLayer('https://openstreetmap.org{z}/{x}/{y}.png').addTo(map);
-
-        // Objek penampung penanda pin pendaki
-        const markers = {};
-
-        async function bacaDanKonversiTeks() {
-            try {
-                // Sesuai kode asli Anda: bypass cache fetch setiap 3 detik
-                const respon = await fetch(`${urlJSON}?nocache=${new Date().getTime()}`);
-                const data = await respon.json();
-                
-                if (data) {
-                    let dataTerkonversi = {};
-
-                    Object.keys(data).forEach((idKey) => {
-                        const item = data[idKey];
-                        
-                        // Konversi waktu (Sesuai kode asli Anda)
-                        let waktuLokal = "Tidak Terdeteksi";
-                        if (item.last_online) {
-                            const ts = parseInt(item.last_online);
-                            waktuLokal = !isNaN(ts) ? new Date(ts).toLocaleString('id-ID') : item.last_online;
-                        }
-
-                        const lat = parseFloat(item.latitude);
-                        const lng = parseFloat(item.longitude);
-
-                        // Masukkan ke struktur teks log kiri
-                        dataTerkonversi[idKey] = {
-                            "latitude": lat,
-                            "longitude": lng,
-                            "waktu_update": waktuLokal
-                        };
-
-                        // PEMETAAN VISUAL PIN DI PETA SECARA REAL-TIME
-                        if (!isNaN(lat) && !isNaN(lng)) {
-                            const infoPopup = `<b>📌 ID: ${idKey}</b><br>Lat: ${lat}<br>Lng: ${lng}<br>Jam: ${waktuLokal}`;
-                            
-                            if (markers[idKey]) {
-                                // Jika pendaki sudah ada, geser pin dan update balon teksnya
-                                markers[idKey].setLatLng([lat, lng]);
-                                markers[idKey].getPopup().setContent(infoPopup);
-                            } else {
-                                // Jika baru terdeteksi, gambar pin baru berwarna hijau
-                                markers[idKey] = L.marker([lat, lng]).addTo(map)
-                                    .bindPopup(infoPopup);
-                            }
-                        }
-                    });
-
-                    // Cetak hasil string JSON ke panel monitor hijau (Sesuai kode asli Anda)
-                    document.getElementById("output-teks").innerText = JSON.stringify(dataTerkonversi, null, 4);
-                } else {
-                    document.getElementById("output-teks").innerText = "Database Terhubung, tetapi kosong.";
-                }
-            } catch (e) {
-document.getElementById("output-teks").innerText = "Gagal mengambil data. Periksa Koneksi/Rules Firebase.";}}// Jalankan looping real-time per 3 detikbacaDanKonversiTeks();setInterval(bacaDanKonversiTeks, 3000);
+</body>
+</html>
