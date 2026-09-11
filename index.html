@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Realtime Monitoring GPS Pendaki</title>
+    <title>Realtime Monitoring GPS Pendaki (Secure Key)</title>
 
     <!-- Bootstrap CSS Online -->
     <link href="https://bootstrapcdn.com" rel="stylesheet">
@@ -13,21 +13,23 @@
     <link rel="stylesheet" href="https://unpkg.com" />
 
     <style>
+        body { padding-top: 20px; background-color: #f5f5f5; }
+        .well { background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); font-size: 16px; font-weight: bold; }
+        h1 { font-weight: bold; color: #2c3e50; }
         #map {
             width: 100%;
-            height: 400px; /* Tinggi peta disesuaikan agar rapi di bawah teks */
-            border-radius: 4px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            height: 400px;
+            border-radius: 6px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.15);
             margin-top: 15px;
+            margin-bottom: 20px;
         }
-        .well {
-            font-size: 16px;
-            font-weight: bold;
-        }
+        latitude, longitude, jam { font-weight: bold; color: #2980b9; font-size: 18px; }
     </style>
 </head>
 <body>
 
+    <!-- Header Judul Terpusat Bootstrap -->
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-6 col-md-offset-3">
@@ -37,56 +39,55 @@
         <hr>
     </div>
 
+    <!-- Konten Pemantauan Koordinat -->
     <div class="container">
         <div class="row">
             <div class="col-md-12">
                 <div class="well">
-                    Latitude : <span id="txt-lat">Menunggu Firebase...</span>
+                    <!-- Menggunakan struktur Tag Kustom format Anda -->
+                    Latitude : <latitude>Menunggu Firebase...</latitude>
                     <hr>
-                    Longitude : <span id="txt-lng">Menunggu Firebase...</span>
+                    Longitude : <longitude>Menunggu Firebase...</longitude>
                     <hr>
-                    Last Online (Database) : <span id="txt-online">-</span>
-                    <hr>
-                    Waktu Browser (Jam HP) : <span id="txt-jam">00:00:00</span>
+                    Jam Sistem HP : <jam>00:00:00</jam>
                 </div>
             </div>
         </div>
 
-        <!-- Wadah Tempat Peta Ditampilkan -->
+        <!-- Tempat Peta -->
         <div class="row">
             <div class="col-md-12">
                 <div id="map"></div>
             </div>
         </div>
 
+        <!-- Footer -->
         <hr>
         <div class="row">
             <div class="text-center col-md-6 col-md-offset-3">
-                <h4>Monitoring Pendaki</h4>
-                <p>Copyright © 2026 · All Rights Reserved</p>
+                <h4>Footer Monitoring</h4>
+                <p>Copyright © 2026 · All Rights Reserved · <a href="#">My IoT Website</a></p>
             </div>
         </div>
         <hr>
     </div>
 
-    <!-- Pustaka JavaScript Utama (Dipasang di bawah agar cepat dimuat) -->
+    <!-- Pustaka JS Dasar -->
     <script src="https://googleapis.com"></script>
     <script src="https://bootstrapcdn.com"></script>
-    
-    <!-- Pustaka Leaflet.js -->
     <script src="https://unpkg.com"></script>
 
-    <!-- Pustaka Resmi Firebase SDK Versi Jadul (Kompatibel penuh tanpa modul/CORS) -->
-    <script src="https://firebase.com"></script>
+    <!-- Memuat Firebase SDK Versi 8 Kompatibilitas Tinggi (Wajib Pakai Key & Bebas Error Seluler) -->
+    <script src="https://gstatic.com"></script>
+    <script src="https://gstatic.com"></script>
 
     <script>
-        // 1. Elemen Penampung Teks
-        var txtLat = document.getElementById('txt-lat'); 
-        var txtLng = document.getElementById('txt-lng'); 
-        var txtOnline = document.getElementById('txt-online');
-        var txtJam = document.getElementById('txt-jam');
+        // 1. Deklarasi Elemen Tag Kustom
+        var a = document.querySelector('latitude'); 
+        var b = document.querySelector('longitude'); 
+        var c = document.querySelector('jam');
 
-        // 2. Fungsi Jam Digital Sederhana (Sesuai metode Anda)
+        // 2. Logika Jam Sistem HP (Fungsi Bawaan Anda)
         var pad = function(x){
             return x < 10 ? '0' + x : x;
         }
@@ -95,61 +96,70 @@
             var h = pad(e.getHours());
             var m = pad(e.getMinutes());
             var s = pad(e.getSeconds()); 
-            txtJam.innerHTML = [h, m, s].join(':');
+            c.innerHTML = [h, m, s].join(':');
         }
         setInterval(showclock, 1000);
 
-        // 3. Inisialisasi Peta Awal (Default pusat di Indonesia)
+        // 3. Inisialisasi Peta Awal (Fokus default Jakarta)
         var map = L.map('map').setView([-6.2088, 106.8456], 13);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap'
+            attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
         
         var pendakiMarker = null;
 
-        // 4. Koneksi Firebase Menggunakan Alamat Jalur Lama Anda
-        // Langsung menembak spesifik ke folder: pendaki -> id_1
-        var myRef = new Firebase('https://firebaseio.com');
+        // 4. Kredensial Firebase RESMI & LENGKAP Milik Proyek Anda
+        var config = {
+            apiKey: "AIzaSyArmLd5ByLoCm3RwQ_eGbpJIAUdoyM0D5E",
+            authDomain: "://firebaseapp.com",
+            databaseURL: "https://firebaseio.com",
+            projectId: "digimon-iot-8fe36",
+            storageBucket: "digimon-iot-8fe36.firebasestorage.app",
+            messagingSenderId: "315467255779",
+            appId: "1:315467255779:web:299993f92f6cce31ccdad6"
+        };
+        
+        // Mengaktifkan koneksi Firebase menggunakan konfigurasi Key di atas
+        firebase.initializeApp(config);
+        var database = firebase.database();
 
-        // Menggunakan event 'value' agar langsung membaca data saat web pertama dibuka, 
-        // sekaligus otomatis memperbarui peta tiap kali koordinat berubah secara realtime.
+        // 5. Menembak target ke Jalur Data: /pendaki/id_1
+        var myRef = database.ref('pendaki/id_1');
+
+        // Mendengarkan data masuk secara Real-Time sejati (.on value)
         myRef.on('value', function(snapshot){
             var data = snapshot.val();
             
             if(data) {
-                // Ambil data latitude dan longitude
                 var lat = parseFloat(data.latitude);
                 var lng = parseFloat(data.longitude);
 
                 if(!isNaN(lat) && !isNaN(lng)) {
-                    // Masukkan angka desimal ke tampilan teks Bootstrap
-                    txtLat.innerHTML = lat;
-                    txtLng.innerHTML = lng;
+                    // Update teks koordinat ke dalam tag kustom di layar
+                    a.innerHTML = lat;
+                    b.innerHTML = lng;
 
-                    // Konversi unix timestamp dari database menjadi format jam tanggal lokal
-                    if(data.last_online) {
-                        var ts = parseInt(data.last_online);
-                        txtOnline.innerHTML = !isNaN(ts) ? new Date(ts).toLocaleString('id-ID') : data.last_online;
-                    }
-
-                    // Render atau geser penanda (marker) di peta Leaflet
+                    // Plotting posisi penanda di atas peta
                     if (pendakiMarker === null) {
                         pendakiMarker = L.marker([lat, lng]).addTo(map);
-                        pendakiMarker.bindPopup("<b>Pendaki ID_1</b><br>Lokasi Terdeteksi.").openPopup();
+                        pendakiMarker.bindPopup("<b>Pendaki ID_1</b><br>Terkunci via Secure Key.").openPopup();
                     } else {
                         pendakiMarker.setLatLng([lat, lng]);
                     }
                     
-                    // Kamera peta otomatis bergeser memfokuskan lokasi pendaki
+                    // Kamera peta otomatis bergeser memfokuskan objek
                     map.setView([lat, lng], 15);
                 } else {
-                    txtLat.innerHTML = "Format data di database bukan angka!";
+                    a.innerHTML = "Format Data Koordinat Bukan Angka!";
+                    b.innerHTML = "Format Data Koordinat Bukan Angka!";
                 }
             } else {
-                txtLat.innerHTML = "Data path pendaki/id_1 kosong (null).";
+                a.innerHTML = "Data Path Kosong (Null)";
+                b.innerHTML = "Data Path Kosong (Null)";
             }
         }, function(errorObject) {
-            txtLat.innerHTML = "Akses ditolak: " + errorObject.code + ". Silakan ubah Rules Firebase ke true.";
+            a.innerHTML = "Akses Ditolak Firebase: " + errorObject.code;
+            b.innerHTML = "Periksa kembali aturan tab Rules di Firebase Console.";
         });
     </script>
 </body>
