@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Multi-Monitoring Peta Pendaki Real-Time</title>
+    <title>Peta Multi-Marker Pendaki Real-Time</title>
     
     <!-- CSS Peta Leaflet -->
     <link rel="stylesheet" href="https://unpkg.com" />
@@ -66,82 +66,89 @@
     <script src="https://unpkg.com"></script>
 
     <script>
-        // 1. Inisialisasi Peta Awal (Default pusat ke area Jawa/Jakarta)
-        const map = L.map('map').setView([-6.2088, 106.8456], 10);
+        // 1. Inisialisasi Peta Awal (Default pusat ke area koordinat default Anda di Jakarta)
+        const map = L.map('map').setView([-6.2088, 106.8456], 12);
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
             attribution: '&copy; OpenStreetMap'
         }).addTo(map);
 
-        // Objek kosong untuk menampung marker agar tidak duplikat saat ter-update
+        // Objek kosong penampung marker agar tidak duplikat saat ter-update otomatis
         let listMarkers = {}; 
 
-        // URL REST API Tingkat Atas /pendaki.json yang Anda berikan
+        // Sesuai instruksi Anda, menggunakan URL tingkat atas pendaki.json
         const firebaseURL = "https://digimon-iot-8fe36-default-rtdb.firebaseio.com/pendaki.json";
 
-        // 2. Fungsi Mengambil & Melakukan Looping Seluruh Data Pendaki
+        // 2. Fungsi Mengambil & Mengekstrak Banyak Marker Sekaligus
         async function sinkronisasiBanyakMarker() {
             try {
-                // Bypass cache agar browser Android langsung membaca pembaruan ESP32 tiap detik
+                // Bypass cache agar Chrome Android langsung membaca data riil dari ESP32 tanpa tersumbat memory lama
                 const respon = await fetch(`${firebaseURL}?cache=${new Date().getTime()}`);
+                
+                if (!respon.ok) throw new Error("Akses ditolak");
+                
                 const rootData = await respon.json();
                 
                 if (rootData) {
-                    // Hidupkan lampu indikator menjadi hijau (koneksi sukses)
+                    // Nyalakan lampu indikator menjadi hijau (sukses terkoneksi)
                     document.getElementById('status-light').classList.add('status-online');
                     
                     let htmlStatus = "";
-                    let bounds = []; // Array untuk menampung semua titik koordinat agar peta bisa auto-zoom pas
+                    let bounds = []; // Array untuk menampung semua koordinat pendaki
 
-                    // Looping membaca semua ID pendaki di dalam database (id_1, id_2, dst)
+                    // Melakukan perulangan otomatis (looping) untuk mengecek semua ID yang ada di dalam data pendaki
                     Object.keys(rootData).forEach((idKey) => {
                         const item = rootData[idKey];
+                        
+                        // Ekstraksi data latitude & longitude
                         const lat = parseFloat(item.latitude);
                         const lng = parseFloat(item.longitude);
 
                         if (!isNaN(lat) && !isNaN(lng)) {
-                            bounds.push([lat, lng]); // Simpan koordinat ke array bounds
+                            bounds.push([lat, lng]); // Masukkan titik koordinat ke dalam array pembatas
 
-                            // Format Teks Waktu Last Online
+                            // Format Teks Waktu Aktif dari Server Timestamp ESP32 Anda
                             let waktuText = "Tidak diketahui";
                             if (item.last_online) {
                                 const ts = parseInt(item.last_online);
                                 waktuText = !isNaN(ts) ? new Date(ts).toLocaleTimeString('id-ID') : item.last_online;
                             }
 
-                            // Susun teks ringkasan untuk kotak pojok kanan atas
+                            // Menyusun daftar teks info koordinat untuk kotak melayang
                             htmlStatus += `<p><b>${idKey.toUpperCase()}:</b> ${lat.toFixed(4)}, ${lng.toFixed(4)} (<small>${waktuText}</small>)</p>`;
 
-                            // --- LOGIKA PLOTTING MARKER PETA ---
+                            // --- LOGIKA PLOTTING MARKER DI PETA ---
                             if (listMarkers[idKey]) {
-                                // Jika marker ID ini sudah ada di peta, cukup geser koordinatnya secara real-time
+                                // Jika marker ID ini sudah ada di peta, cukup geser posisinya secara dinamis
                                 listMarkers[idKey].setLatLng([lat, lng]);
                             } else {
-                                // Jika ID baru terdeteksi, buatkan marker baru
+                                // Jika mendeteksi ID baru (misal id_1 dan id_2), pasang marker baru
                                 listMarkers[idKey] = L.marker([lat, lng]).addTo(map);
-                                listMarkers[idKey].bindPopup(`<b>Target: ${idKey.toUpperCase()}</b><br>Status: Terlacak.<br><small>Update: ${waktuText}</small>`).openPopup();
+                                listMarkers[idKey].bindPopup(`<b>Target: ${idKey.toUpperCase()}</b><br>Status: Terlacak Real-Time.<br><small>Update: ${waktuText}</small>`).openPopup();
                             }
                         }
                     });
 
-                    // Update kotak teks pemantau di layar HP
+                    // Tampilkan daftar teks pendaki ke kotak pemantauan HTML
                     document.getElementById("daftar-pendaki").innerHTML = htmlStatus;
 
-                    // Mengatur kamera peta otomatis melebar/mengecil agar SEMUA marker masuk ke layar secara pas
-                    if (bounds.length > 0) {
-                        map.fitBounds(bounds, { padding: [50, 50] });
+                    // Mengatur kamera peta otomatis melebar/mengecil agar SEMUA penanda masuk ke dalam layar pas
+                    if (bounds.length > 1) {
+                        map.fitBounds(bounds, { padding: [50, 50] }); // NILAI PADDING SUDAH DIPERBAIKI SANGAT STABIL
+                    } else if (bounds.length === 1) {
+                        map.setView(bounds[0], 15); // Jika baru 1 marker yang aktif, lakukan pemfokusan biasa
                     }
                 } else {
                     document.getElementById("daftar-pendaki").innerText = "Tidak ada data pendaki aktif.";
                 }
             } catch (error) {
                 console.error("Fetch Error:", error.message);
-                document.getElementById("daftar-pendaki").innerText = "Koneksi ke Firebase dibatasi browser.";
+                document.getElementById("daftar-pendaki").innerText = "Gagal mengambil data. Pastikan Rules Firebase diset ke true.";
             }
         }
 
-        // Jalankan sinkronisasi otomatis secara berkala setiap 4 detik sekali
+        // Jalankan sinkronisasi penanda secara otomatis setiap 4 detik sekali
         sinkronisasiBanyakMarker();
         setInterval(sinkronisasiBanyakMarker, 4000);
     </script>
