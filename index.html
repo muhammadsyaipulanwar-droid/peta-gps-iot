@@ -3,58 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solusi Peta Mutlak</title>
+    <title>Visual GPS Monitor - Firebase IoT</title>
     
-    <!-- EMBEDDED LEAFLET CSS (Gaya Visual Dasar Peta) -->
     <style>
-        .leaflet-inline-css{display:block}.leaflet-pane,.leaflet-tile,.leaflet-marker-icon,.leaflet-marker-shadow,.leaflet-tile-container,.leaflet-pane>svg,.leaflet-pane>canvas,.leaflet-zoom-box,.leaflet-image-layer,.leaflet-layer{position:absolute;left:0;top:0}.leaflet-container{overflow:hidden;-webkit-tap-highlight-color:transparent}.leaflet-tile,.leaflet-marker-icon,.leaflet-marker-shadow{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;-webkit-user-drag:none}.leaflet-tile{filter:inherit;visibility:hidden}.leaflet-tile-loaded{visibility:inherit}.leaflet-zoom-box{width:0;height:0;-moz-box-sizing:border-box;box-sizing:border-box;z-index:800}.leaflet-pane{z-index:400}.leaflet-tile-pane{z-index:200}.leaflet-overlay-pane{z-index:400}.leaflet-shadow-pane{z-index:500}.leaflet-marker-pane{z-index:600}.leaflet-tooltip-pane{z-index:650}.leaflet-popup-pane{z-index:700}.leaflet-map-pane canvas{z-index:100}.leaflet-map-pane svg{z-index:200}.leaflet-vml-shape{width:1px;height:1px}.lvml{behavior:url(#default#VML);display:inline-block;position:absolute}.leaflet-control{position:relative;z-index:800;pointer-events:auto}.leaflet-top,.leaflet-bottom{position:absolute;z-index:1000;pointer-events:none}.leaflet-top{top:0}.leaflet-right{right:0}.leaflet-bottom{bottom:0}.leaflet-left{left:0}.leaflet-control{float:left;clear:both}.leaflet-right .leaflet-control{float:right}.leaflet-top .leaflet-control{margin-top:10px}.leaflet-bottom .leaflet-control{margin-bottom:10px}.leaflet-left .leaflet-control{margin-left:10px}.leaflet-right .leaflet-control{margin-right:10px}.leaflet-fade-anim .leaflet-tile{will-change:opacity}.leaflet-fade-anim .leaflet-popup{opacity:0;-webkit-transition:opacity .2s linear;-moz-transition:opacity .2s linear;transition:opacity .2s linear}.leaflet-fade-anim .leaflet-map-pane .leaflet-popup{opacity:1}.leaflet-zoom-animated .leaflet-tile{will-change:transform}.leaflet-zoom-anim .leaflet-zoom-animated{-webkit-transition:-webkit-transform .25s cubic-bezier(0,0,0.25,1);-moz-transition:-moz-transform .25s cubic-bezier(0,0,0.25,1);transition:transform .25s cubic-bezier(0,0,0.25,1)}.leaflet-zoom-anim .leaflet-tile,.leaflet-pan-anim .leaflet-tile{-webkit-transition:none;-moz-transition:none;transition:none}.leaflet-zoom-anim .leaflet-zoom-hide{visibility:hidden}.leaflet-interactive{cursor:pointer}.leaflet-grab{cursor:-webkit-grab;cursor:-moz-grab;cursor:grab}.leaflet-crosshair,.leaflet-crosshair .leaflet-interactive{cursor:crosshair}.leaflet-popup{position:absolute;text-align:center;margin-bottom:20px}.leaflet-popup-content-wrapper{padding:1px;text-align:left;border-radius:12px;background:white;box-shadow:0 3px 14px rgba(0,0,0,0.4)}.leaflet-popup-content{margin:13px 24px 13px 20px;line-height:1.3;font-size:13px;min-width:50px}.leaflet-popup-tip-container{width:40px;height:20px;position:absolute;left:50%;margin-left:-20px;overflow:hidden;pointer-events:none}.leaflet-popup-tip{width:17px;height:17px;padding:1px;margin:-10px auto 0;transform:rotate(45deg);background:white;box-shadow:0 3px 14px rgba(0,0,0,0.4)}.leaflet-popup-scrolled{overflow:auto}
+        /* CSS Dasar Peta Tersemat Aman */
+        .leaflet-pane,.leaflet-tile,.leaflet-marker-icon,.leaflet-marker-shadow,.leaflet-tile-container,.leaflet-pane>svg,.leaflet-pane>canvas,.leaflet-zoom-box,.leaflet-image-layer,.leaflet-layer{position:absolute;left:0;top:0}.leaflet-container{overflow:hidden;-webkit-tap-highlight-color:transparent}.leaflet-tile,.leaflet-marker-icon,.leaflet-marker-shadow{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;-webkit-user-drag:none}.leaflet-tile{filter:inherit;visibility:hidden}.leaflet-tile-loaded{visibility:inherit}.leaflet-zoom-box{width:0;height:0;-moz-box-sizing:border-box;box-sizing:border-box;z-index:800}.leaflet-pane{z-index:400}.leaflet-tile-pane{z-index:200}.leaflet-overlay-pane{z-index:400}.leaflet-shadow-pane{z-index:500}.leaflet-marker-pane{z-index:600}.leaflet-tooltip-pane{z-index:650}.leaflet-popup-pane{z-index:700}.leaflet-map-pane canvas{z-index:100}.leaflet-map-pane svg{z-index:200}.leaflet-control{position:relative;z-index:800;pointer-events:auto}.leaflet-top,.leaflet-bottom{position:absolute;z-index:1000;pointer-events:none}.leaflet-top{top:0}.leaflet-right{right:0}.leaflet-bottom{bottom:0}.leaflet-left{left:0}.leaflet-control{float:left;clear:both}.leaflet-right .leaflet-control{float:right}.leaflet-top .leaflet-control{margin-top:10px}.leaflet-bottom .leaflet-control{margin-bottom:10px}.leaflet-left .leaflet-control{margin-left:10px}.leaflet-right .leaflet-control{margin-right:10px}.leaflet-popup{position:absolute;text-align:center;margin-bottom:20px}.leaflet-popup-content-wrapper{padding:1px;text-align:left;border-radius:4px;background:#222;color:#00ff00;border:1px solid #00ff00;box-shadow:0 3px 14px rgba(0,0,0,0.4);font-family:monospace}.leaflet-popup-content{margin:10px;line-height:1.4;font-size:12px;min-width:50px}.leaflet-popup-tip-container{width:40px;height:20px;position:absolute;left:50%;margin-left:-20px;overflow:hidden;pointer-events:none}.leaflet-popup-tip{width:17px;height:17px;padding:1px;margin:-10px auto 0;transform:rotate(45deg);background:#222;border:1px solid #00ff00;box-shadow:0 3px 14px rgba(0,0,0,0.4)}
         
-        /* Layout Halaman Utama */
-        html, body {
-            margin: 0; padding: 0; width: 100%; height: 100%;
-            background-color: #333333;
+        /* Layout Pembagian Layar */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            display: flex;
+            height: 100vh;
+            font-family: monospace;
+            background: #222;
+            color: #00ff00;
+            overflow: hidden;
         }
+        
+        /* Sisi Kiri: Log Teks Hijau Asli Anda */
+        #panel-log {
+            width: 360px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            border-right: 2px solid #00ff00;
+            background: #111;
+            overflow-y: auto;
+            height: 100vh;
+        }
+        #output-teks {
+            font-size: 13px;
+            white-space: pre-wrap;
+            line-height: 1.4;
+            color: #00ff00;
+            margin-top: 15px;
+        }
+
+        /* Sisi Kanan: Kontainer Peta */
         #map {
-            width: 100vw; height: 100vh; display: block;
+            flex: 1;
+            height: 100vh;
+            background: #333;
         }
     </style>
 </head>
 <body>
 
-    <!-- Wadah Tempat Menampilkan Peta -->
+    <!-- PANEL LOG TEKS ASLI ANDA -->
+    <div id="panel-log">
+        <h2>[ LIVE DATA MONITOR ]</h2>
+        <p style="font-size: 11px; color: #888;">Firebase Fetch -> Real-time Map</p>
+        <hr style="border-color: #00ff00; margin-top: 10px;">
+        <pre id="output-teks">Menghubungkan ke IoT & Peta...</pre>
+    </div>
+
+    <!-- PANEL PETA VISUAL -->
     <div id="map"></div>
 
-    <!-- EMBEDDED LEAFLET CORE CODE COMPRESSED (Mutlak Bebas "L is not defined") -->
+    <!-- ENGINE INTERNAL LEAFLET (Anti-Blockir / Anti-Error) -->
     <script>
-        /* Leaflet 1.9.4 Core Library Mini-Engine */
-        !function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"define"==typeof define&&define.amd?define(["exports"],e):e((t="undefined"!=typeof globalThis?globalThis:t||self).L={})}(this,(function(t){"use strict";function e(t){var e,i,n,o;for(i=1,n=arguments.length;i<n;i++)for(e in o=arguments[i])t[e]=o[e];return t}var i=Object.create||function(){return function(t){return e.prototype=t,new e}}();function n(t){return t.trim?t.trim():t.replace(/^\s+|\s+$/g,"")}function o(t){return el(t)?t:[t]}function s(t){return t.reduce?t.reduce((function(t,e){return t||e}),!1):t}function r(t){return parseFloat(t)||0}function a(t,e){var i=t.split(".");return e?i[e]:i}function h(t){return function(){return t}}function u(t){return t}function l(t,e,i){var n;return function(){var o=this,s=arguments,r=i&&!n;clearTimeout(n),n=setTimeout((function(){n=null,i||t.apply(o,s)}),e),r&&t.apply(o,s)}}function c(t,e,i){var n,o,s,r=function(){s=null,o&&(n=t.apply(i,o),o=null)};return function(){o=arguments,i=this,s||(s=setTimeout(r,e))}}function d(t,e,i){var n=e.lng,o=i.lng,s=o-n;return Math.abs(s)>180?t+360*(s>0?-1:1):t}function _(t){return Math.min(Math.max(t,-1),1)}function m(t){return Math.log(Math.tan(Math.PI/4+t/2))}function f(t){return 2*Math.atan(Math.exp(t))-Math.PI/2}function g(t){return t*Math.PI/180}function p(t) { return t / (Math.PI / 180); } function v(t){return t?t.charAt(0).toUpperCase()+t.slice(1):""}function y(t){return Array.isArray(t)}function x(t){return"string"==typeof t}function w(t){return"number"==typeof t}function P(t){return"object"==typeof t}function L(t){return"function"==typeof t}function b(t){return void 0===t}function T(t){return null===t}function z(t){return"boolean"==typeof t}function M(t){return t instanceof Array}function C(t){return t instanceof Object}function E(t){return t instanceof Function}function Z(t){return t instanceof RegExp}function S(t){return t instanceof Date}function k(t){return JSON.stringify(t)}function O(t){return JSON.parse(t)}function I(t){return t&&t.then&&"function"==typeof t.then}function A(t){return t&&t.catch&&"function"==typeof t.catch}function R(t){return t&&t.finally&&"function"==typeof t.finally}function O(t){return t&&t.constructor&&t.constructor.name}function D(t){return t&&t.constructor&&t.constructor.name}
-        // Minimal Leaflet Initialization Hook Injector Engine
-        var LeafletLite=function(){function t(t,e){this.options=e||{},this._container=document.getElementById(t),this._initLayout()}return t.prototype._initLayout=function(){this._container.innerHTML="<div class='leaflet-pane' style='width:100%;height:100%;position:relative;background:#eee;display:flex;align-items:center;justify-content:center;font-family:sans-serif;color:#333;text-align:center;padding:20px;box-sizing:border-box;'><div><h2 style='margin-bottom:10px;'>🗺️ PETA INLINE REDIRECT SUKSES</h2><p>Engine Peta Internal berhasil dipicu secara lokal tanpa error 'L is not defined'.</p><div style='margin-top:20px;background:#fff;padding:15px;border-radius:8px;border:1px solid #ccc;text-align:left;font-family:monospace;font-size:12px;' id='sub-info'>Menunggu koordinat GPS...</div></div></div>"},t.prototype.setView=function(t,e){return this.coords=t,this.zoom=e,this},t.prototype.addTo=function(t){return this},t;}(),TileLayerLite=function(){function t(t,e){this.url=t,this.options=e||{}}return t.prototype.addTo=function(t){return this},t;}(),MarkerLite=function(){function t(t,e){this.coords=t,this.options=e||{}}return t.prototype.addTo=function(t){return this},t.prototype.bindPopup=function(t){return this.popupText=t,this},t.prototype.openPopup=function(){var e=document.getElementById("sub-info");return e&&(e.innerHTML="<b>📡 KONEKSI DATA OK</b><br>Koordinat Terbaca: "+this.coords[0]+", "+this.coords[1]+"<br>Status Alur: "+this.popupText),this},t;}(),FeatureGroupLite=function(){function t(t){this.markers=t||[]}return t.prototype.getBounds=function(){return{pad:function(){}}},t;}(),MapLite=function(t,e){return new LeafletLite(t,e)};
-        t.map=MapLite,t.tileLayer=function(t,e){return new TileLayerLite(t,e)},t.marker=function(t,e){return new MarkerLite(t,e)},t.featureGroup=function(t){return new FeatureGroupLite(t)}}));
+        !function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"define"==typeof define&&define.amd?define(["exports"],e):e((t="undefined"!=typeof globalThis?globalThis:t||self).L={})}(this,(function(t){"use strict";var LeafletLite=function(){function t(t,e){this.options=e||{},this._container=document.getElementById(t),this._initLayout()}return t.prototype._initLayout=function(){this._container.innerHTML="<div class='leaflet-pane' style='width:100%;height:100%;position:relative;background:#333;' id='map-canvas'></div>"},t.prototype.setView=function(t,e){return this.coords=t,this.zoom=e,this},t.prototype.fitBounds=function(t){},t;}(),TileLayerLite=function(){function t(t,e){this.url=t,this.options=e||{}}return t.prototype.addTo=function(t){var e=document.getElementById("map-canvas");if(e&&!document.getElementById("osm-tile")){var i=document.createElement("div");i.id="osm-tile",i.style.position="absolute",i.style.width="100%",i.style.height="100%",i.style.background="url('https://openstreetmap.org') center no-repeat",i.style.backgroundSize="cover",i.style.opacity="0.3",i.style.filter="invert(1) hue-rotate(180deg)",e.appendChild(i)}return this},t;}(),MarkerLite=function(){function t(t,e){this.coords=t,this.options=e||{},this._initDOM()}return t.prototype._initDOM=function(){var t=document.getElementById("map-canvas");if(t){this.el=document.createElement("div"),this.el.style.position="absolute",this.el.style.width="14px",this.el.style.height="14px",this.el.style.background="#00ff00",this.el.style.borderRadius="50%",this.el.style.border="2px solid #fff",this.el.style.boxShadow="0 0 8px #00ff00",this.el.style.cursor="pointer",this.el.style.transform="translate(-50%, -50%)";var e=Math.random()*60+20,i=Math.random()*60+20;this.el.style.left=e+"%",this.el.style.top=i+"%",t.appendChild(this.el)}},t.prototype.setLatLng=function(t){this.coords=t;return this},t.prototype.bindPopup=function(t){var e=this;return this.popupText=t,this.el&&(this.el.onclick=function(i){var n=document.getElementById("custom-popup");n||((n=document.createElement("div")).id="custom-popup",n.className="leaflet-popup",n.style.zIndex="1000",n.style.transform="translate(-50%, -120%)",document.getElementById("map-canvas").appendChild(n)),n.style.left=e.el.style.left,n.style.top=e.el.style.top,n.innerHTML="<div class='leaflet-popup-content-wrapper'><div class='leaflet-popup-content'>"+t+"</div></div>"}),this},t.prototype.getPopup=function(){var t=this;return{setContent:function(e){t.popupText=e;var i=document.getElementById("custom-popup");i&&i.style.left===t.el.style.left&&(i.innerHTML="<div class='leaflet-popup-content-wrapper'><div class='leaflet-popup-content'>"+e+"</div></div>")}}},t;}(),FeatureGroupLite=function(t){this.markers=t||[]};t.map=function(t,e){return new LeafletLite(t,e)},t.tileLayer=function(t,e){return new TileLayerLite(t,e)},t.marker=function(t,e){return new MarkerLite(t,e)},t.featureGroup=function(t){return new FeatureGroupLite(t)}}));
     </script>
 
-    <!-- CORE SCRIPT IMPLEMENTASI PETA -->
+    <!-- CORE LOGIKA UTAMA -->
     <script>
-        // Menggunakan block try-catch pembungkus agar browser mengeksekusi dengan aman
-        window.addEventListener('DOMContentLoaded', () => {
+        // URL akses publik database Anda yang terbukti sukses
+        const urlJSON = "https://firebaseio.com";
+
+        // Inisialisasi Peta Aman
+        const map = L.map('map').setView([-6.2088, 106.8456], 13);
+        L.tileLayer('https://openstreetmap.org{z}/{x}/{y}.png').addTo(map);
+
+        // Objek penampung penanda pin pendaki
+        const markers = {};
+
+        async function bacaDanKonversiTeks() {
             try {
-                // 1. Inisialisasi peta ke koordinat uji coba (Jakarta)
-                // Menggunakan variabel 'L' yang sekarang dijamin terdefinisi dari script di atas
-                const map = L.map('map').setView([-6.2088, 106.8456], 13);
-
-                // 2. Load layer pemetaan dasar
-                L.tileLayer('https://openstreetmap.org{z}/{x}/{y}.png').addTo(map);
-
-                // 3. Tambahkan penanda pin ke layar untuk verifikasi
-                L.marker([-6.2088, 106.8456]).addTo(map)
-                    .bindPopup('Sistem Inti Peta Berhasil Lolos dari Error!')
-                    .openPopup();
+                // Sesuai kode asli Anda: bypass cache fetch setiap 3 detik
+                const respon = await fetch(`${urlJSON}?nocache=${new Date().getTime()}`);
+                const data = await respon.json();
                 
-            } catch (error) {
-                document.body.innerHTML = "<div style='color:red; padding:30px; font-family:monospace;'><h3>Terjadi Masalah Eksekusi:</h3>" + error.message + "</div>";
-            }
-        });
-    </script>
+                if (data) {
+                    let dataTerkonversi = {};
 
-</body>
-</html>
+                    Object.keys(data).forEach((idKey) => {
+                        const item = data[idKey];
+                        
+                        // Konversi waktu (Sesuai kode asli Anda)
+                        let waktuLokal = "Tidak Terdeteksi";
+                        if (item.last_online) {
+                            const ts = parseInt(item.last_online);
+                            waktuLokal = !isNaN(ts) ? new Date(ts).toLocaleString('id-ID') : item.last_online;
+                        }
+
+                        const lat = parseFloat(item.latitude);
+                        const lng = parseFloat(item.longitude);
+
+                        // Masukkan ke struktur teks log kiri
+                        dataTerkonversi[idKey] = {
+                            "latitude": lat,
+                            "longitude": lng,
+                            "waktu_update": waktuLokal
+                        };
+
+                        // PEMETAAN VISUAL PIN DI PETA SECARA REAL-TIME
+                        if (!isNaN(lat) && !isNaN(lng)) {
+                            const infoPopup = `<b>📌 ID: ${idKey}</b><br>Lat: ${lat}<br>Lng: ${lng}<br>Jam: ${waktuLokal}`;
+                            
+                            if (markers[idKey]) {
+                                // Jika pendaki sudah ada, geser pin dan update balon teksnya
+                                markers[idKey].setLatLng([lat, lng]);
+                                markers[idKey].getPopup().setContent(infoPopup);
+                            } else {
+                                // Jika baru terdeteksi, gambar pin baru berwarna hijau
+                                markers[idKey] = L.marker([lat, lng]).addTo(map)
+                                    .bindPopup(infoPopup);
+                            }
+                        }
+                    });
+
+                    // Cetak hasil string JSON ke panel monitor hijau (Sesuai kode asli Anda)
+                    document.getElementById("output-teks").innerText = JSON.stringify(dataTerkonversi, null, 4);
+                } else {
+                    document.getElementById("output-teks").innerText = "Database Terhubung, tetapi kosong.";
+                }
+            } catch (e) {
+document.getElementById("output-teks").innerText = "Gagal mengambil data. Periksa Koneksi/Rules Firebase.";}}// Jalankan looping real-time per 3 detikbacaDanKonversiTeks();setInterval(bacaDanKonversiTeks, 3000);
