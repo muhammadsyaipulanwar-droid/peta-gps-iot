@@ -1,1 +1,135 @@
 
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Peta Monitoring Pendaki Real-Time</title>
+    
+    <!-- CSS Leaflet untuk Peta -->
+    <link rel="stylesheet" href="https://unpkg.com" />
+    
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+        }
+        #map {
+            width: 100% !important;
+            height: 100vh !important;
+            display: block;
+        }
+        .info-box {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 12px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+            z-index: 9999;
+            min-width: 200px;
+        }
+        .info-box h3 { margin: 0 0 8px 0; font-size: 14px; color: #222; }
+        .info-box p { margin: 4px 0; font-size: 12px; color: #444; }
+        .status-dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background-color: #e74c3c;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        .status-online {
+            background-color: #2ecc71 !important;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Kotak Informasi Pemantauan -->
+    <div class="info-box">
+        <h3><span id="status-light" class="status-dot"></span> Monitoring: ID 1</h3>
+        <p><strong>Latitude:</strong> <span id="txt-lat">Menghubungkan...</span></p>
+        <p><strong>Longitude:</strong> <span id="txt-lng">Menghubungkan...</span></p>
+        <p><strong>Last Online:</strong> <span id="txt-online">-</span></p>
+    </div>
+
+    <!-- Wadah Utama Peta -->
+    <div id="map"></div>
+
+    <!-- JS Leaflet -->
+    <script src="https://unpkg.com"></script>
+
+    <script>
+        // 1. Inisialisasi Peta Leaflet awal (diarahkan ke Jakarta default)
+        const map = L.map('map').setView([-6.2088, 106.8456], 13);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap'
+        }).addTo(map);
+
+        let pendakiMarker = null;
+
+        // URL REST API Firebase Langsung ke Path Pendaki Anda
+        const firebaseURL = "https://firebaseio.com";
+
+        // 2. Fungsi Ambil Data dari Firebase
+        async function ambilDataFirebase() {
+            try {
+                // Menambahkan timestamp acak agar browser HP tidak terjebak cache lama
+                const response = await fetch(`${firebaseURL}?nocache=${new Date().getTime()}`);
+                
+                if (!response.ok) throw new Error("Akses ditolak");
+                
+                const data = await response.json();
+                
+                if (data) {
+                    const lat = parseFloat(data.latitude);
+                    const lng = parseFloat(data.longitude);
+                    
+                    if (!isNaN(lat) && !isNaN(lng)) {
+                        // Indikator sukses terhubung (Hijau)
+                        document.getElementById('status-light').classList.add('status-online');
+                        
+                        // Format waktu online
+                        let waktuOnline = "Tidak diketahui";
+                        if (data.last_online) {
+                            const timestamp = parseInt(data.last_online);
+                            waktuOnline = !isNaN(timestamp) ? new Date(timestamp).toLocaleString('id-ID') : data.last_online;
+                        }
+
+                        // Tampilkan teks koordinat ke layar HP
+                        document.getElementById('txt-lat').innerText = lat;
+                        document.getElementById('txt-lng').innerText = lng;
+                        document.getElementById('txt-online').innerText = waktuOnline;
+
+                        // Perbarui Posisi Marker di Peta
+                        if (pendakiMarker === null) {
+                            pendakiMarker = L.marker([lat, lng]).addTo(map);
+                            pendakiMarker.bindPopup("<b>Pendaki ID_1</b><br>Lokasi Aktif.").openPopup();
+                            map.setView([lat, lng], 15); 
+                        } else {
+                            pendakiMarker.setLatLng([lat, lng]);
+                        }
+                    }
+                } else {
+                    document.getElementById('txt-lat').innerText = "Data Kosong (Null)";
+                }
+            } catch (error) {
+                document.getElementById('txt-lat').innerText = "Firebase Terkunci (Ganti Rules)";
+            }
+        }
+
+        // Pengulangan otomatis mengambil data baru setiap 3 detik sekali
+        ambilDataFirebase(); 
+        setInterval(ambilDataFirebase, 3000); 
+    </script>
+</body>
+</html>
