@@ -1,135 +1,156 @@
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Peta Monitoring Pendaki Real-Time</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Realtime Monitoring GPS Pendaki</title>
+
+    <!-- Bootstrap CSS Online -->
+    <link href="https://bootstrapcdn.com" rel="stylesheet">
     
-    <!-- CSS Leaflet untuk Peta -->
+    <!-- Leaflet CSS untuk Peta -->
     <link rel="stylesheet" href="https://unpkg.com" />
-    
+
     <style>
-        html, body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-        }
         #map {
-            width: 100% !important;
-            height: 100vh !important;
-            display: block;
+            width: 100%;
+            height: 400px; /* Tinggi peta disesuaikan agar rapi di bawah teks */
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            margin-top: 15px;
         }
-        .info-box {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 12px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-            z-index: 9999;
-            min-width: 200px;
-        }
-        .info-box h3 { margin: 0 0 8px 0; font-size: 14px; color: #222; }
-        .info-box p { margin: 4px 0; font-size: 12px; color: #444; }
-        .status-dot {
-            display: inline-block;
-            width: 10px;
-            height: 10px;
-            background-color: #e74c3c;
-            border-radius: 50%;
-            margin-right: 5px;
-        }
-        .status-online {
-            background-color: #2ecc71 !important;
+        .well {
+            font-size: 16px;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
 
-    <!-- Kotak Informasi Pemantauan -->
-    <div class="info-box">
-        <h3><span id="status-light" class="status-dot"></span> Monitoring: ID 1</h3>
-        <p><strong>Latitude:</strong> <span id="txt-lat">Menghubungkan...</span></p>
-        <p><strong>Longitude:</strong> <span id="txt-lng">Menghubungkan...</span></p>
-        <p><strong>Last Online:</strong> <span id="txt-online">-</span></p>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-6 col-md-offset-3">
+                <h1 class="text-center">Realtime Monitoring GPS Using Firebase</h1>
+            </div>
+        </div>
+        <hr>
     </div>
 
-    <!-- Wadah Utama Peta -->
-    <div id="map"></div>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="well">
+                    Latitude : <span id="txt-lat">Menunggu Firebase...</span>
+                    <hr>
+                    Longitude : <span id="txt-lng">Menunggu Firebase...</span>
+                    <hr>
+                    Last Online (Database) : <span id="txt-online">-</span>
+                    <hr>
+                    Waktu Browser (Jam HP) : <span id="txt-jam">00:00:00</span>
+                </div>
+            </div>
+        </div>
 
-    <!-- JS Leaflet -->
+        <!-- Wadah Tempat Peta Ditampilkan -->
+        <div class="row">
+            <div class="col-md-12">
+                <div id="map"></div>
+            </div>
+        </div>
+
+        <hr>
+        <div class="row">
+            <div class="text-center col-md-6 col-md-offset-3">
+                <h4>Monitoring Pendaki</h4>
+                <p>Copyright © 2026 · All Rights Reserved</p>
+            </div>
+        </div>
+        <hr>
+    </div>
+
+    <!-- Pustaka JavaScript Utama (Dipasang di bawah agar cepat dimuat) -->
+    <script src="https://googleapis.com"></script>
+    <script src="https://bootstrapcdn.com"></script>
+    
+    <!-- Pustaka Leaflet.js -->
     <script src="https://unpkg.com"></script>
 
-    <script>
-        // 1. Inisialisasi Peta Leaflet awal (diarahkan ke Jakarta default)
-        const map = L.map('map').setView([-6.2088, 106.8456], 13);
+    <!-- Pustaka Resmi Firebase SDK Versi Jadul (Kompatibel penuh tanpa modul/CORS) -->
+    <script src="https://firebase.com"></script>
 
+    <script>
+        // 1. Elemen Penampung Teks
+        var txtLat = document.getElementById('txt-lat'); 
+        var txtLng = document.getElementById('txt-lng'); 
+        var txtOnline = document.getElementById('txt-online');
+        var txtJam = document.getElementById('txt-jam');
+
+        // 2. Fungsi Jam Digital Sederhana (Sesuai metode Anda)
+        var pad = function(x){
+            return x < 10 ? '0' + x : x;
+        }
+        var showclock = function(){
+            var e = new Date();
+            var h = pad(e.getHours());
+            var m = pad(e.getMinutes());
+            var s = pad(e.getSeconds()); 
+            txtJam.innerHTML = [h, m, s].join(':');
+        }
+        setInterval(showclock, 1000);
+
+        // 3. Inisialisasi Peta Awal (Default pusat di Indonesia)
+        var map = L.map('map').setView([-6.2088, 106.8456], 13);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
             attribution: '&copy; OpenStreetMap'
         }).addTo(map);
+        
+        var pendakiMarker = null;
 
-        let pendakiMarker = null;
+        // 4. Koneksi Firebase Menggunakan Alamat Jalur Lama Anda
+        // Langsung menembak spesifik ke folder: pendaki -> id_1
+        var myRef = new Firebase('https://firebaseio.com');
 
-        // URL REST API Firebase Langsung ke Path Pendaki Anda
-        const firebaseURL = "https://firebaseio.com";
+        // Menggunakan event 'value' agar langsung membaca data saat web pertama dibuka, 
+        // sekaligus otomatis memperbarui peta tiap kali koordinat berubah secara realtime.
+        myRef.on('value', function(snapshot){
+            var data = snapshot.val();
+            
+            if(data) {
+                // Ambil data latitude dan longitude
+                var lat = parseFloat(data.latitude);
+                var lng = parseFloat(data.longitude);
 
-        // 2. Fungsi Ambil Data dari Firebase
-        async function ambilDataFirebase() {
-            try {
-                // Menambahkan timestamp acak agar browser HP tidak terjebak cache lama
-                const response = await fetch(`${firebaseURL}?nocache=${new Date().getTime()}`);
-                
-                if (!response.ok) throw new Error("Akses ditolak");
-                
-                const data = await response.json();
-                
-                if (data) {
-                    const lat = parseFloat(data.latitude);
-                    const lng = parseFloat(data.longitude);
-                    
-                    if (!isNaN(lat) && !isNaN(lng)) {
-                        // Indikator sukses terhubung (Hijau)
-                        document.getElementById('status-light').classList.add('status-online');
-                        
-                        // Format waktu online
-                        let waktuOnline = "Tidak diketahui";
-                        if (data.last_online) {
-                            const timestamp = parseInt(data.last_online);
-                            waktuOnline = !isNaN(timestamp) ? new Date(timestamp).toLocaleString('id-ID') : data.last_online;
-                        }
+                if(!isNaN(lat) && !isNaN(lng)) {
+                    // Masukkan angka desimal ke tampilan teks Bootstrap
+                    txtLat.innerHTML = lat;
+                    txtLng.innerHTML = lng;
 
-                        // Tampilkan teks koordinat ke layar HP
-                        document.getElementById('txt-lat').innerText = lat;
-                        document.getElementById('txt-lng').innerText = lng;
-                        document.getElementById('txt-online').innerText = waktuOnline;
-
-                        // Perbarui Posisi Marker di Peta
-                        if (pendakiMarker === null) {
-                            pendakiMarker = L.marker([lat, lng]).addTo(map);
-                            pendakiMarker.bindPopup("<b>Pendaki ID_1</b><br>Lokasi Aktif.").openPopup();
-                            map.setView([lat, lng], 15); 
-                        } else {
-                            pendakiMarker.setLatLng([lat, lng]);
-                        }
+                    // Konversi unix timestamp dari database menjadi format jam tanggal lokal
+                    if(data.last_online) {
+                        var ts = parseInt(data.last_online);
+                        txtOnline.innerHTML = !isNaN(ts) ? new Date(ts).toLocaleString('id-ID') : data.last_online;
                     }
-                } else {
-                    document.getElementById('txt-lat').innerText = "Data Kosong (Null)";
-                }
-            } catch (error) {
-                document.getElementById('txt-lat').innerText = "Firebase Terkunci (Ganti Rules)";
-            }
-        }
 
-        // Pengulangan otomatis mengambil data baru setiap 3 detik sekali
-        ambilDataFirebase(); 
-        setInterval(ambilDataFirebase, 3000); 
+                    // Render atau geser penanda (marker) di peta Leaflet
+                    if (pendakiMarker === null) {
+                        pendakiMarker = L.marker([lat, lng]).addTo(map);
+                        pendakiMarker.bindPopup("<b>Pendaki ID_1</b><br>Lokasi Terdeteksi.").openPopup();
+                    } else {
+                        pendakiMarker.setLatLng([lat, lng]);
+                    }
+                    
+                    // Kamera peta otomatis bergeser memfokuskan lokasi pendaki
+                    map.setView([lat, lng], 15);
+                } else {
+                    txtLat.innerHTML = "Format data di database bukan angka!";
+                }
+            } else {
+                txtLat.innerHTML = "Data path pendaki/id_1 kosong (null).";
+            }
+        }, function(errorObject) {
+            txtLat.innerHTML = "Akses ditolak: " + errorObject.code + ". Silakan ubah Rules Firebase ke true.";
+        });
     </script>
 </body>
 </html>
