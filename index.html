@@ -3,51 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Uji Coba Memunculkan Peta</title>
+    <title>Uji Coba Peta Mutlak</title>
     
-    <!-- CSS Leaflet dari CDNJS Cloudflare -->
-    <link rel="stylesheet" href="https://cloudflare.com" />
+    <!-- MENGGUNAKAN CDN JSDELIVR (Jauh lebih ramah untuk browser lokal) + ATRIBUT CROSSORIGIN MANDATORI -->
+    <link rel="stylesheet" href="https://jsdelivr.net" crossorigin="" />
     
     <style>
-        /* Memaksa halaman menggunakan ruang penuh layar */
+        /* Memastikan ruang kontainer benar-benar 100% penuh terlihat */
         html, body {
             margin: 0;
             padding: 0;
             width: 100%;
             height: 100%;
-            background-color: #cccccc; /* Warna abu-abu sebagai penanda jika peta gagal */
+            background-color: #555555; /* Warna abu-abu gelap */
         }
         
-        /* Wadah Peta Utama wajib berukuran penuh */
         #map {
-            width: 100%;
-            height: 100%;
+            width: 100vw;
+            height: 100vh;
+            display: block;
         }
     </style>
 </head>
 <body>
 
-    <!-- KONTEN HANYA PETA SAJA -->
+    <!-- Wadah peta -->
     <div id="map"></div>
 
-    <!-- JS Leaflet dari CDNJS Cloudflare -->
-    <script src="https://cloudflare.com"></script>
+    <!-- JS Leaflet dari CDN jsDelivr + ATRIBUT CROSSORIGIN -->
+    <script src="https://jsdelivr.net" crossorigin=""></script>
 
     <script>
-        // 1. Inisialisasi dasar peta (Fokus langsung ke Jakarta sebagai pengujian awal)
-        // Jika koordinat ini berhasil, Leaflet dipastikan bekerja
-        const map = L.map('map').setView([-6.2088, 106.8456], 13); 
+        // Memastikan seluruh dokumen selesai dimuat di memori browser
+        window.addEventListener('DOMContentLoaded', () => {
+            
+            try {
+                // 1. Inisialisasi peta ke koordinat uji coba (Jakarta)
+                const map = L.map('map').setView([-6.2088, 106.8456], 13);
 
-        // 2. MENGGUNAKAN SERVER OPENSTREETMAP STANDAR (Paling aman & pasti muncul)
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '&copy; OpenStreetMap contributors'
-        }).addTo(map);
+                // 2. Menggunakan OpenStreetMap Standar dengan format universal
+                L.tileLayer('https://openstreetmap.org{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                    attribution: '&copy; OpenStreetMap'
+                }).addTo(map);
 
-        // 3. Menambahkan satu penanda (Marker) tiruan untuk tes visual
-        L.marker([-6.2088, 106.8456]).addTo(map)
-            .bindPopup('<b>Peta Berhasil Muncul!</b><br>Jika Anda melihat pesan ini, Leaflet Anda normal.')
-            .openPopup();
+                // 3. Tambahkan penanda visual untuk pengetesan awal
+                L.marker([-6.2088, 106.8456]).addTo(map)
+                    .bindPopup('Peta Sukses Dimuat!')
+                    .openPopup();
+
+                // TRICK PALING AMPUH: Memaksa browser menghitung ulang ukuran kotak peta 
+                // jika Leaflet sempat "bingung" membaca resolusi layar Anda saat booting awal
+                setTimeout(() => {
+                    map.invalidateSize();
+                    console.log("Peta dipaksa render ulang ukuran.");
+                }, 500);
+
+            } catch (error) {
+                alert("Ada error pada script Leaflet: " + error.message);
+            }
+            
+        });
     </script>
 
 </body>
