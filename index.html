@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="https://unpkg.com" />
     
     <style>
-        /* Mengatur agar peta memenuhi seluruh layar browser */
         html, body {
             margin: 0;
             padding: 0;
@@ -17,53 +16,56 @@
             height: 100%;
             overflow: hidden;
             font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
         }
         #map {
-            width: 100%;
-            height: 100%;
-            z-index: 1;
+            width: 100% !important;
+            height: 100vh !important;
+            display: block;
         }
-        /* Desain kotak informasi tambahan di pojok peta */
         .info-box {
             position: absolute;
             top: 20px;
             right: 20px;
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.95);
             padding: 15px;
             border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            z-index: 1000;
-            min-width: 200px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+            z-index: 9999;
+            min-width: 220px;
         }
-        .info-box h3 { margin: 0 0 10px 0; font-size: 16px; color: #333; }
-        .info-box p { margin: 5px 0; font-size: 13px; color: #555; }
+        .info-box h3 { margin: 0 0 10px 0; font-size: 15px; color: #222; }
+        .info-box p { margin: 6px 0; font-size: 13px; color: #444; }
         .status-dot {
             display: inline-block;
             width: 10px;
             height: 10px;
-            background-color: #2ecc71;
+            background-color: #e74c3c;
             border-radius: 50%;
             margin-right: 5px;
+        }
+        .status-online {
+            background-color: #2ecc71 !important;
         }
     </style>
 </head>
 <body>
 
-    <!-- Wadah Kotak Informasi Terkini -->
+    <!-- Kotak Informasi Terkini -->
     <div class="info-box">
-        <h3><span class="status-dot"></span> Monitoring: ID 1</h3>
-        <p><strong>Latitude:</strong> <span id="txt-lat">-</span></p>
-        <p><strong>Longitude:</strong> <span id="txt-lng">-</span></p>
+        <h3><span id="status-light" class="status-dot"></span> Monitoring: ID 1</h3>
+        <p><strong>Latitude:</strong> <span id="txt-lat">Menunggu Data...</span></p>
+        <p><strong>Longitude:</strong> <span id="txt-lng">Menunggu Data...</span></p>
         <p><strong>Last Online:</strong> <span id="txt-online">-</span></p>
     </div>
 
-    <!-- Wadah Utama Tempat Peta Ditampilkan -->
+    <!-- Wadah Utama Peta -->
     <div id="map"></div>
 
     <!-- JavaScript Leaflet.js -->
     <script src="https://unpkg.com"></script>
 
-    <!-- Menggunakan Firebase Versi Kompatibilitas via Cloudflare CDN (Bebas Error CORS & MIME) -->
+    <!-- Menggunakan Firebase Versi Kompatibilitas Resmi via Cloudflare -->
     <script src="https://cloudflare.com"></script>
     <script src="https://cloudflare.com"></script>
 
@@ -79,72 +81,76 @@
             appId: "1:315467255779:web:299993f92f6cce31ccdad6"
         };
 
-        // Inisialisasi Firebase (Format kompatibilitas skrip umum)
+        // 1. Inisialisasi Firebase
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        // Inisialisasi Peta Awal (Titik tengah default diatur ke Indonesia)
-        const map = L.map('map').setView([-2.5489, 118.0149], 5);
+        // 2. Inisialisasi Peta Awal (Peta dipaksa langsung tampil sejak detik pertama)
+        const map = L.map('map').setView([-6.2088, 106.8456], 12);
 
-        // Load gambar peta grafis dari OpenStreetMap gratis
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
             attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
 
-        // Siapkan variabel kosong untuk Marker (Penanda)
         let pendakiMarker = null;
 
-        // Ambil data secara Real-Time dari path /pendaki/id_1
+        // 3. Menghubungkan ke Node Database Realtime /pendaki/id_1
         const pendakiRef = database.ref('pendaki/id_1');
 
         pendakiRef.on('value', (snapshot) => {
             const data = snapshot.val();
             
-            // Validasi apakah data koordinat masuk dan tidak kosong
-            if (data && data.latitude && data.longitude) {
+            if (data) {
+                // Konversi paksa string/teks koordinat menjadi angka riil desimal
                 const lat = parseFloat(data.latitude);
                 const lng = parseFloat(data.longitude);
                 
-                // Format tanggal Last Online
-                let waktuOnline = "Tidak diketahui";
-                if (data.last_online) {
-                    waktuOnline = typeof data.last_online === 'number' 
-                        ? new Date(data.last_online).toLocaleString('id-ID') 
-                        : data.last_online;
-                }
-
-                // Update teks di Kotak Informasi pojok kanan atas
-                document.getElementById('txt-lat').innerText = lat;
-                document.getElementById('txt-lng').innerText = lng;
-                document.getElementById('txt-online').innerText = waktuOnline;
-
-                // Teks yang muncul di dalam balon popup saat marker diklik
-                const popupContent = `
-                    <div style="font-size:13px;">
-                        <b>Pendaki ID_1</b><br>
-                        Status: Aktif Bergerak<br>
-                        <small>Last Online: ${waktuOnline}</small>
-                    </div>
-                `;
-
-                if (pendakiMarker === null) {
-                    // Jika web baru dibuka & marker belum ada di peta, buat baru
-                    pendakiMarker = L.marker([lat, lng]).addTo(map);
-                    pendakiMarker.bindPopup(popupContent).openPopup();
+                // Validasi ulang apakah hasil konversi angka tersebut valid
+                if (!isNaN(lat) && !isNaN(lng)) {
+                    // Ubah lampu indikator menjadi hijau (aktif)
+                    document.getElementById('status-light').classList.add('status-online');
                     
-                    // Zoom otomatis lebih dekat ke posisi pendaki saat pertama kali terdeteksi
-                    map.setView([lat, lng], 15);
+                    // Format penulisan waktu aktif (mengubah timestamp ke jam lokal WIB/WITA)
+                    let waktuOnline = "Tidak diketahui";
+                    if (data.last_online) {
+                        const timestamp = parseInt(data.last_online);
+                        waktuOnline = !isNaN(timestamp) 
+                            ? new Date(timestamp).toLocaleString('id-ID') 
+                            : data.last_online;
+                    }
+
+                    // Tampilkan data ke kotak HTML di layar
+                    document.getElementById('txt-lat').innerText = lat;
+                    document.getElementById('txt-lng').innerText = lng;
+                    document.getElementById('txt-online').innerText = waktuOnline;
+
+                    const popupContent = `
+                        <div style="font-size:13px; line-height:1.4;">
+                            <b>Pendaki ID_1</b><br>
+                            Status: Terhubung Aktif<br>
+                            <small>Waktu: ${waktuOnline}</small>
+                        </div>
+                    `;
+
+                    if (pendakiMarker === null) {
+                        // Pasang marker baru di titik koordinat pelacakan
+                        pendakiMarker = L.marker([lat, lng]).addTo(map);
+                        pendakiMarker.bindPopup(popupContent).openPopup();
+                        
+                        // Kamera langsung meluncur fokus ke area pendaki berada (Jakarta)
+                        map.setView([lat, lng], 15);
+                    } else {
+                        // Geser penanda secara real-time jika koordinat berubah di Firebase
+                        pendakiMarker.setLatLng([lat, lng]);
+                        pendakiMarker.setPopupContent(popupContent);
+                    }
                 } else {
-                    // Jika marker sudah ada, geser posisinya secara halus
-                    pendakiMarker.setLatLng([lat, lng]);
-                    pendakiMarker.setPopupContent(popupContent);
-                    
-                    // Kamera peta akan otomatis bergeser mengikuti pergerakan marker
-                    map.panTo([lat, lng]);
+                    document.getElementById('txt-lat').innerText = "Format Koordinat Bukan Angka";
+                    document.getElementById('txt-lng').innerText = "Format Koordinat Bukan Angka";
                 }
             } else {
-                console.warn("Data dari Firebase diterima, tetapi koordinat latitude/longitude kosong.");
+                document.getElementById('txt-lat').innerText = "Path /id_1 Tidak Ditemukan";
             }
         });
     </script>
