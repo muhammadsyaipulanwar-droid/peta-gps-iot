@@ -3,41 +3,147 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teks Monitor Firebase</title>
-</head>
-<body style="font-family: monospace; padding: 20px; background: #222; color: #00ff00;">
-
-    <h2>[ LIVE DATA MONITOR ]</h2>
-    <hr style="border-color: #00ff00;">
+    <title>Multi-Monitoring Peta Pendaki Real-Time</title>
     
-    <!-- Wadah Teks Hijau seperti layar komputer server -->
-    <pre id="output-teks" style="font-size: 16px; white-space: pre-wrap;">Memanggil data IoT...</pre>
+    <!-- CSS Peta Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com" />
+    
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+        }
+        #map {
+            width: 100% !important;
+            height: 100vh !important;
+            display: block;
+        }
+        .info-box {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 12px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+            z-index: 9999;
+            min-width: 220px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .info-box h3 { margin: 0 0 8px 0; font-size: 14px; color: #222; }
+        .info-box p { margin: 4px 0; font-size: 12px; color: #444; border-bottom: 1px dashed #ccc; padding-bottom: 4px; }
+        .status-dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background-color: #e74c3c;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        .status-online {
+            background-color: #2ecc71 !important;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Kotak Status Pemantauan Multi-User -->
+    <div class="info-box">
+        <h3><span id="status-light" class="status-dot"></span> Radar Pendaki Aktif</h3>
+        <div id="daftar-pendaki">Menghubungkan ke Firebase...</div>
+    </div>
+
+    <!-- Wadah Peta Utama -->
+    <div id="map"></div>
+
+    <!-- JS Peta Leaflet -->
+    <script src="https://unpkg.com"></script>
 
     <script>
-        // URL akses publik database Anda
-        const urlJSON = "https://digimon-iot-8fe36-default-rtdb.firebaseio.com/pendaki/id_1.json";
+        // 1. Inisialisasi Peta Awal (Default pusat ke area Jawa/Jakarta)
+        const map = L.map('map').setView([-6.2088, 106.8456], 10);
 
-        async function bacaDataTeks() {
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap'
+        }).addTo(map);
+
+        // Objek kosong untuk menampung marker agar tidak duplikat saat ter-update
+        let listMarkers = {}; 
+
+        // URL REST API Tingkat Atas /pendaki.json yang Anda berikan
+        const firebaseURL = "https://digimon-iot-8fe36-default-rtdb.firebaseio.com/pendaki.json";
+
+        // 2. Fungsi Mengambil & Melakukan Looping Seluruh Data Pendaki
+        async function sinkronisasiBanyakMarker() {
             try {
-                // Bypass cache agar teks selalu ter-update otomatis tiap detik
-                const respon = await fetch(`${urlJSON}?nocache=${new Date().getTime()}`);
-                const data = await respon.json();
+                // Bypass cache agar browser Android langsung membaca pembaruan ESP32 tiap detik
+                const respon = await fetch(`${firebaseURL}?cache=${new Date().getTime()}`);
+                const rootData = await respon.json();
                 
-                if (data) {
-                    // Cetak semua data ke layar dalam bentuk string teks rapi
-                    document.getElementById("output-teks").innerText = JSON.stringify(data, null, 4);
+                if (rootData) {
+                    // Hidupkan lampu indikator menjadi hijau (koneksi sukses)
+                    document.getElementById('status-light').classList.add('status-online');
+                    
+                    let htmlStatus = "";
+                    let bounds = []; // Array untuk menampung semua titik koordinat agar peta bisa auto-zoom pas
+
+                    // Looping membaca semua ID pendaki di dalam database (id_1, id_2, dst)
+                    Object.keys(rootData).forEach((idKey) => {
+                        const item = rootData[idKey];
+                        const lat = parseFloat(item.latitude);
+                        const lng = parseFloat(item.longitude);
+
+                        if (!isNaN(lat) && !isNaN(lng)) {
+                            bounds.push([lat, lng]); // Simpan koordinat ke array bounds
+
+                            // Format Teks Waktu Last Online
+                            let waktuText = "Tidak diketahui";
+                            if (item.last_online) {
+                                const ts = parseInt(item.last_online);
+                                waktuText = !isNaN(ts) ? new Date(ts).toLocaleTimeString('id-ID') : item.last_online;
+                            }
+
+                            // Susun teks ringkasan untuk kotak pojok kanan atas
+                            htmlStatus += `<p><b>${idKey.toUpperCase()}:</b> ${lat.toFixed(4)}, ${lng.toFixed(4)} (<small>${waktuText}</small>)</p>`;
+
+                            // --- LOGIKA PLOTTING MARKER PETA ---
+                            if (listMarkers[idKey]) {
+                                // Jika marker ID ini sudah ada di peta, cukup geser koordinatnya secara real-time
+                                listMarkers[idKey].setLatLng([lat, lng]);
+                            } else {
+                                // Jika ID baru terdeteksi, buatkan marker baru
+                                listMarkers[idKey] = L.marker([lat, lng]).addTo(map);
+                                listMarkers[idKey].bindPopup(`<b>Target: ${idKey.toUpperCase()}</b><br>Status: Terlacak.<br><small>Update: ${waktuText}</small>`).openPopup();
+                            }
+                        }
+                    });
+
+                    // Update kotak teks pemantau di layar HP
+                    document.getElementById("daftar-pendaki").innerHTML = htmlStatus;
+
+                    // Mengatur kamera peta otomatis melebar/mengecil agar SEMUA marker masuk ke layar secara pas
+                    if (bounds.length > 0) {
+                        map.fitBounds(bounds, { padding: [50, 50] });
+                    }
                 } else {
-                    document.getElementById("output-teks").innerText = "Database Terhubung, tetapi kosong.";
+                    document.getElementById("daftar-pendaki").innerText = "Tidak ada data pendaki aktif.";
                 }
-            } catch (e) {
-                document.getElementById("output-teks").innerText = "Gagal mengambil teks. Pastikan Rules Firebase Anda sudah diset ke true.";
+            } catch (error) {
+                console.error("Fetch Error:", error.message);
+                document.getElementById("daftar-pendaki").innerText = "Koneksi ke Firebase dibatasi browser.";
             }
         }
 
-        // Cek data otomatis setiap 3 detik sekali
-        bacaDataTeks();
-        setInterval(bacaDataTeks, 3000);
+        // Jalankan sinkronisasi otomatis secara berkala setiap 4 detik sekali
+        sinkronisasiBanyakMarker();
+        setInterval(sinkronisasiBanyakMarker, 4000);
     </script>
-
 </body>
 </html>
