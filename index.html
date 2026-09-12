@@ -8,7 +8,10 @@
  
    <body style="font-family: Arial, sans-serif; padding: 20px;">
       <h2>Monitoring Multi-Client GPS Pendaki</h2>
-      <p style="color: #666; font-size: 14px;">Status: Menampilkan Seluruh Client Aktif Berdampingan...</p>
+      <p style="color: #666; font-size: 14px; margin-bottom: 5px;">Status: Menampilkan Seluruh Client Aktif Berdampingan...</p>
+      
+      <!-- WADAH KHUSUS MENAMPILKAN DATA JSON DI BAWAH BARIS STATUS -->
+      <pre id="output-json" style="background: #111; color: #00ff00; padding: 15px; border-radius: 5px; font-family: monospace; font-size: 13px; max-width: 650px; overflow-x: auto; margin-bottom: 15px; line-height: 1.4; border: 1px solid #333;">Memanggil log teks IoT Firebase...</pre>
       
       <!-- Kontainer Peta sesuai ukuran sukses Anda -->
       <div id = "map" style = "width: 650px; height: 450px; background-color: #eee;"></div>
@@ -37,6 +40,8 @@
                 const data = await respon.json();
                 
                 if (data) {
+                    let dataTerkonversi = {};
+
                     // Loop otomatis membaca SATU PER SATU semua ID (id_1, id_2, dll) secara mandiri
                     Object.keys(data).forEach((idKey) => {
                         const item = data[idKey];
@@ -51,6 +56,13 @@
                         // Memastikan koordinat diubah menjadi angka pecahan float murni
                         const lat = parseFloat(item.latitude);
                         const lng = parseFloat(item.longitude);
+
+                        // Masukkan ke struktur objek baru untuk dicetak sebagai teks JSON bersih
+                        dataTerkonversi[idKey] = {
+                            "latitude": lat,
+                            "longitude": lng,
+                            "waktu_update": waktuLokal
+                        };
 
                         // Gambar ke peta secara terpisah jika datanya valid angka
                         if (!isNaN(lat) && !isNaN(lng)) {
@@ -67,15 +79,27 @@
                             }
                         }
                     });
+
+                    // CETAK DATA JSON TERKONVERSI KE WADAH DI ATAS PETA
+                    document.getElementById("output-json").innerText = JSON.stringify(dataTerkonversi, null, 4);
+
+                } else {
+                    document.getElementById("output-json").innerText = "Database Terhubung, tetapi kosong.";
                 }
             } catch (e) {
                 console.error("Gagal memperbarui peta dari Firebase:", e);
+                document.getElementById("output-json").innerText = "Gagal memproses data. Periksa koneksi internet.";
             }
          }
 
          // Jalankan fungsi pembacaan data secara otomatis per 3 detik sekali secara real-time
          updateMarkerDariFirebase();
          setInterval(updateMarkerDariFirebase, 3000);
+
+         // Trik memaksa layout peta ter-render utuh (mencegah blank sisa ruang) setelah halaman terbuka
+         setTimeout(function() {
+            map.invalidateSize();
+         }, 500);
       </script>
    </body>   
 </html>
