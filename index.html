@@ -1,22 +1,23 @@
 <!DOCTYPE html>
 <html>
    <head>
-      <title>Menampilkan Marker Pada Map - Live Firebase</title>
-      <link rel = "stylesheet" href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-      <script src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+      <title>Menampilkan 2 Marker Dari Firebase</title>
+      <link rel = "stylesheet" href = "https://unpkg.com"/>
+      <script src = "https://unpkg.com"></script>
    </head>
  
    <body style="font-family: Arial, sans-serif; padding: 20px;">
       <h2>Monitoring Multi-Client GPS Pendaki</h2>
-      <p style="color: #666; font-size: 14px;">Status: Mengambil data real-time dari Firebase IoT...</p>
+      <p style="color: #666; font-size: 14px;">Status: Menampilkan Seluruh Client Aktif Berdampingan...</p>
       
       <!-- Kontainer Peta sesuai ukuran sukses Anda -->
       <div id = "map" style = "width: 650px; height: 450px; background-color: #eee;"></div>
       
       <script>         
+         // Menggunakan tingkat Zoom 5 (Lebih Luas) agar posisi ID_1 dan ID_2 yang berjauhan tetap terlihat bersamaan
          var mapOptions = {
-            center: [-6.2293796, 106.6647002],
-            zoom: 10
+            center: [-6.2088, 106.8456],
+            zoom: 5
          }
  
          var map = new L.map('map', mapOptions);            
@@ -24,59 +25,48 @@
          map.addLayer(layer);
  
          // Alamat URL Firebase JSON milik Anda
-         const urlJSON = "https://digimon-iot-8fe36-default-rtdb.firebaseio.com/pendaki.json";
+         const urlJSON = "https://firebaseio.com";
 
-         // Objek memori untuk menyimpan marker agar tidak duplikat di peta saat refresh
+         // Objek memori untuk mengunci ID masing-masing marker agar tidak saling tumpang tindih
          const markers = {};
 
          async function updateMarkerDariFirebase() {
             try {
-                // Sesuai trik andalan Anda: bypass cache fetch agar data selalu update tiap 3 detik
+                // Trik bypass cache fetch agar data selalu update tiap 3 detik bersih
                 const respon = await fetch(`${urlJSON}?nocache=${new Date().getTime()}`);
                 const data = await respon.json();
                 
                 if (data) {
-                    let adaMarkerBaru = false;
-
-                    // Lakukan perulangan otomatis membaca setiap id_1, id_2, dst di Firebase
+                    // Loop otomatis membaca SATU PER SATU semua ID (id_1, id_2, dll) secara mandiri
                     Object.keys(data).forEach((idKey) => {
                         const item = data[idKey];
                         
-                        // Konversi server timestamp menjadi waktu lokal Indonesia (Sesuai fungsi sukses Anda)
+                        // Konversi server timestamp menjadi waktu lokal Indonesia
                         let waktuLokal = "Tidak Terdeteksi";
                         if (item.last_online) {
                             const ts = parseInt(item.last_online);
                             waktuLokal = !isNaN(ts) ? new Date(ts).toLocaleString('id-ID') : item.last_online;
                         }
 
-                        // Mengambil data koordinat numerik asli
+                        // Memastikan koordinat diubah menjadi angka pecahan float murni
                         const lat = parseFloat(item.latitude);
                         const lng = parseFloat(item.longitude);
 
-                        // Gambar ke peta hanya jika data koordinatnya valid angka
+                        // Gambar ke peta secara terpisah jika datanya valid angka
                         if (!isNaN(lat) && !isNaN(lng)) {
-                            const isiPopup = `<b>📌 ID: ${idKey}</b><br>Latitude: ${lat}<br>Longitude: ${lng}<br>Update: ${waktuLokal}`;
+                            const isiPopup = `<b>📌 ID CLIENT: ${idKey}</b><br>Latitude: ${lat}<br>Longitude: ${lng}<br>Update: ${waktuLokal}`;
                             
                             if (markers[idKey]) {
-                                // JIKA MARKER SUDAH ADA: Perbarui posisi koordinat dan teks balonnya saja
+                                // JIKA ID_1 atau ID_2 SUDAH ADA: Geser posisinya masing-masing tanpa mengganggu ID lain
                                 markers[idKey].setLatLng([lat, lng]);
                                 markers[idKey].getPopup().setContent(isiPopup);
                             } else {
-                                // JIKA MARKER BARU: Buat objek penanda baru di peta
+                                // JIKA ID BARU MUNCUL: Gambar objek marker terpisah untuk masing-masing ID
                                 markers[idKey] = L.marker([lat, lng]).addTo(map)
                                     .bindPopup(isiPopup);
-                                adaMarkerBaru = true;
                             }
                         }
                     });
-
-                    // Fitur Opsional Otomatis: Mengatur tingkat Zoom kamera peta secara dinamis
-                    // agar seluruh titik koordinat pendaki yang aktif muat tampil dalam satu layar kotak peta
-                    const markerArray = Object.values(markers);
-                    if (markerArray.length > 0 && (adaMarkerBaru || map.getZoom() === 10)) {
-                        const group = new L.featureGroup(markerArray);
-                        map.fitBounds(group.getBounds().pad(0.2));
-                    }
                 }
             } catch (e) {
                 console.error("Gagal memperbarui peta dari Firebase:", e);
