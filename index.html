@@ -1,158 +1,26 @@
 <!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Visual GPS Monitor - Firebase IoT</title>
-    
-    <!-- 1. CSS LEAFLET RESMI CDN CLOUDFLARE (SUKSES) -->
-    <link rel="stylesheet" href="https://cloudflare.com" integrity="sha512-Zcn693ZgPn7cAaALVov3zUv+2C6G9pUtdXfFA5Ipx0AecDDFBvHshq0mN4l+qWpB13uV8HlW+xN/1UeC09Kng==" crossorigin="" />
-    
-    <style>
-        /* Membagi Layar: Kiri Log Teks Hijau Anda, Kanan Peta Visual */
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            display: flex;
-            height: 100vh;
-            font-family: monospace;
-            background: #222;
-            color: #00ff00;
-            overflow: hidden;
-        }
-        
-        /* Panel Sebelah Kiri: Log Teks Hijau Asli Anda */
-        #panel-log {
-            width: 360px;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            border-right: 2px solid #00ff00;
-            background: #111;
-            overflow-y: auto;
-            height: 100vh;
-        }
-        #output-teks {
-            font-size: 13px;
-            white-space: pre-wrap;
-            line-height: 1.4;
-            color: #00ff00;
-            margin-top: 15px;
-        }
-
-        /* Panel Sebelah Kanan: Wadah Peta Visual Leaflet */
-        #map {
-            flex: 1;
-            height: 100vh;
-            background: #1a1a1a;
-        }
-    </style>
-</head>
-<body>
-
-    <!-- [ PANEL KIRI ] LOG MONITOR TEKS HIJAU ASLI ANDA -->
-    <div id="panel-log">
-        <h2>[ LIVE DATA MONITOR ]</h2>
-        <p style="font-size: 11px; color: #888;">Firebase Fetch -> Real-time Leaflet Map</p>
-        <hr style="border-color: #00ff00; margin-top: 10px;">
-        <pre id="output-teks">Sinkronisasi Peta & Data Firebase...</pre>
-    </div>
-
-    <!-- [ PANEL KANAN ] AREA WADAH PETA LEAFLET -->
-    <div id="map"></div>
-
-    <!-- 2. JAVASCRIPT LEAFLET RESMI CDN CLOUDFLARE (SUKSES) -->
-    <script src="https://cloudflare.com" integrity="sha512-Bw3bT6yA6zS6fEFE2C7H5/H5eF72u1/A4T/tW48z03vE14AecM3c7N7EfaP1B4mZUp7Gf5D7U1B8vH5O0RzNlw==" crossorigin=""></script>
-
-    <script>
-        // URL akses publik database Anda yang terbukti sukses
-        const urlJSON = "https://digimon-iot-8fe36-default-rtdb.firebaseio.com/pendaki.json";
-
-        // Inisialisasi Peta Awal (Fokus default Indonesia)
-        const map = L.map('map').setView([-6.2088, 106.8456], 13);
-
-        // Memuat lapisan gambar peta dunia dari OpenStreetMap
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '&copy; OpenStreetMap'
-        }).addTo(map);
-
-        // Objek memori untuk menyimpan marker agar tidak menggambar ulang (duplikat pin) saat refresh
-        const markers = {};
-
-        async function bacaDanKonversiTeks() {
-            try {
-                // Sesuai kode asli Anda: bypass cache fetch setiap 3 detik
-                const respon = await fetch(`${urlJSON}?nocache=${new Date().getTime()}`);
-                const data = await respon.json();
-                
-                if (data) {
-                    let dataTerkonversi = {};
-                    let adaMarkerBaru = false;
-
-                    Object.keys(data).forEach((idKey) => {
-                        const item = data[idKey];
-                        
-                        // Konversi manual server timestamp menjadi format Jam Lokal (Sesuai kode asli Anda)
-                        let waktuLokal = "Tidak Terdeteksi";
-                        if (item.last_online) {
-                            const ts = parseInt(item.last_online);
-                            waktuLokal = !isNaN(ts) ? new Date(ts).toLocaleString('id-ID') : item.last_online;
-                        }
-
-                        const lat = parseFloat(item.latitude);
-                        const lng = parseFloat(item.longitude);
-
-                        // Masukkan ke struktur teks bersih log terminal kiri
-                        dataTerkonversi[idKey] = {
-                            "latitude": lat,
-                            "longitude": lng,
-                            "waktu_update": waktuLokal
-                        };
-
-                        // PROSES PEMETAAN REAL-TIME PADA LEAFLET MAP
-                        if (!isNaN(lat) && !isNaN(lng)) {
-                            const infoPopup = `<b>📌 ID: ${idKey}</b><br>Lat: ${lat}<br>Lng: ${lng}<br>Jam: ${waktuLokal}`;
-                            
-                            if (markers[idKey]) {
-                                // Jika marker pendaki sudah ada, geser posisi koordinat terbarunya saja
-                                markers[idKey].setLatLng([lat, lng]);
-                                markers[idKey].getPopup().setContent(infoPopup);
-                            } else {
-                                // Jika pendaki baru pertama kali terbaca, buat pin merah baru di peta
-                                markers[idKey] = L.marker([lat, lng]).addTo(map)
-                                    .bindPopup(infoPopup);
-                                adaMarkerBaru = true;
-                            }
-                        }
-                    });
-
-                    // Cetak seluruh hasil struktur JSON teks ke layar terminal monitor hijau Anda
-                    document.getElementById("output-teks").innerText = JSON.stringify(dataTerkonversi, null, 4);
-
-                    // AUTO FOKUS PETA OTOMATIS: 
-                    // Menghitung titik tengah secara dinamis agar seluruh pendaki muat masuk dalam satu layar zoom peta
-                    const markerArray = Object.values(markers);
-                    if (markerArray.length > 0 && (adaMarkerBaru || map.getZoom() === 13)) {
-                        const group = new L.featureGroup(markerArray);
-                        map.fitBounds(group.getBounds().pad(0.2));
-                    }
-                } else {
-                    document.getElementById("output-teks").innerText = "Database Terhubung, tetapi kosong.";
-                }
-            } catch (e) {
-                document.getElementById("output-teks").innerText = "Gagal mengambil teks. Periksa Rules Firebase Anda.";
-            }
-        }
-
-        // Jalankan pengecekan data otomatis setiap 3 detik sekali secara real-time
-        bacaDanKonversiTeks();
-        setInterval(bacaDanKonversiTeks, 3000);
-        
-        // Memaksa browser menghitung ulang kotak layout peta sesaat setelah halaman termuat sempurna
-        setTimeout(() => {
-            map.invalidateSize();
-        }, 500);
-    </script>
-
-</body>
+<html>
+   <head>
+      <title>Menampilkan Marker Pada Map</title>
+      <link rel = "stylesheet" href = "http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css"/>
+      <script src = "http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+   </head>
+ 
+   <body>
+      <h2>MalasNgoding.com - Menampilkan Marker Pada Map</h2>
+      <div id = "map" style = "width: 650px; height: 450px"></div>
+      <script>         
+         var mapOptions = {
+            center: [-6.2293796, 106.6647002],
+            zoom: 10
+         }
+ 
+         var map = new L.map('map', mapOptions);            
+         var layer = new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');               
+         map.addLayer(layer);
+ 
+         var marker = L.marker([-6.232228, 106.847793]).addTo(map);
+ 
+      </script>
+   </body>   
 </html>
