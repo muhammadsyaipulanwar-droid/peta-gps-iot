@@ -2,8 +2,8 @@
 <html>
    <head>
       <title>Menampilkan 2 Marker Dari Firebase</title>
-      <link rel = "stylesheet" href = "https://unpkg.com"/>
-      <script src = "https://unpkg.com"></script>
+      <link rel = "stylesheet" href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+      <script src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
    </head>
  
    <body style="font-family: Arial, sans-serif; padding: 20px;">
@@ -25,7 +25,7 @@
          map.addLayer(layer);
  
          // Alamat URL Firebase JSON milik Anda
-         const urlJSON = "https://firebaseio.com";
+         const urlJSON = "https://digimon-iot-8fe36-default-rtdb.firebaseio.com/pendaki.json";
 
          // Objek memori untuk mengunci ID masing-masing marker agar tidak saling tumpang tindih
          const markers = {};
