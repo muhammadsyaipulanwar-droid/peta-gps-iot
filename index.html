@@ -1,82 +1,41 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Peta Leaflet Saja</title>
-    
-    <!-- 1. CSS LEAFLET RESMI DARI CDN CLOUDFLARE -->
-    <link rel="stylesheet" href="https://cloudflare.com" integrity="sha512-Zcn693ZgPn7cAaALVov3zUv+2C6G9pUtdXfFA5Ipx0AecDDFBvHshq0mN4l+qWpB13uV8HlW+xN/1UeC09Kng==" crossorigin="" />
-    
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
     <style>
-        /* Memaksa peta memenuhi seluruh layar HP / Komputer */
-        html, body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #1a1a1a; /* Latar belakang gelap */
-        }
-        #map {
-            width: 100vw;
-            height: 100vh;
-            display: block;
-        }
+      #map {
+        height: 180px;
+      }
     </style>
-</head>
-<body>
-
-    <!-- Wadah Tunggal Peta -->
-    <div id="map"></div>
-
-    <!-- 2. JAVASCRIPT LEAFLET RESMI DARI CDN CLOUDFLARE -->
-    <script src="https://cloudflare.com" integrity="sha512-Bw3bT6yA6zS6fEFE2C7H5/H5eF72u1/A4T/tW48z03vE14AecM3c7N7EfaP1B4mZUp7Gf5D7U1B8vH5O0RzNlw==" crossorigin=""></script>
-
+    <!-- Make sure you put this AFTER Leaflet's CSS -->
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""
+    ></script>
+    <script
+      type="text/javascript"
+      src="http://code.jquery.com/jquery-1.7.1.min.js"
+    ></script>
+  </head>
+  <body>
+    <!-- define a the area the map will go into. Feel free to change the size as needed -->
+    <div id="map" style="width: 800px; height: 500px"></div>
     <script>
-        // Menunggu seluruh elemen halaman siap
-        window.addEventListener('DOMContentLoaded', () => {
-            try {
-                // 3. Inisialisasi peta (Fokus awal ke koordinat Jakarta)
-                const map = L.map('map').setView([-6.2088, 106.8456], 11);
-
-                // 4. Memuat Gambar Peta dari OpenStreetMap
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    maxZoom: 19,
-                    attribution: '&copy; OpenStreetMap'
-                }).addTo(map);
-
-                // 5. PILIHAN DARURAT: Jika gambar peta internet diblokir,
-                // baris di bawah ini akan menggambar garis kotak koordinat abu-abu di layar Anda.
-                L.gridLayer({
-                    attribution: 'Grid Darurat Aktif'
-                }).createTile = function(coords) {
-                    var tile = document.createElement('div');
-                    tile.style.outline = '1px solid rgba(255,255,255,0.2)';
-                    tile.style.color = '#00ff00';
-                    tile.style.fontFamily = 'monospace';
-                    tile.style.fontSize = '10px';
-                    tile.style.padding = '5px';
-                    tile.innerHTML = 'X:' + coords.x + ', Y:' + coords.y + ', Z:' + coords.z;
-                    return tile;
-                };
-                map.addLayer(L.gridLayer());
-
-                // 6. Menaruh pin penanda di tengah layar
-                L.marker([-6.2088, 106.8456]).addTo(map)
-                    .bindPopup('<b>Sistem Peta Aktif!</b><br>Koordinat: -6.2088, 106.8456')
-                    .openPopup();
-
-                // Memaksa render ulang ukuran agar pas dengan layar browser
-                setTimeout(() => {
-                    map.invalidateSize();
-                }, 300);
-
-            } catch (error) {
-                // Menampilkan kotak pesan jika ada kode script yang macet
-                alert("Gagal memicu Leaflet: " + error.message);
-            }
-        });
+      var map = L.map("map").setView([51.505, -0.09], 13);
+      L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+        attribution:
+          '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+      }).addTo(map);
     </script>
-
-</body>
+  </body>
 </html>
