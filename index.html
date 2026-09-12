@@ -2,13 +2,11 @@
 <html>
    <head>
       <title>Menampilkan 2 Marker Dari Firebase</title>
-      <!-- LINK CSS ASLI (TIDAK BERUBAH) -->
       <link rel = "stylesheet" href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-      <!-- LINK JS ASLI (TIDAK BERUBAH) -->
       <script src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
       
       <style>
-         /* Reset dasar agar pas dan responsif di layar HP Android/iOS */
+         /* Reset dasar agar pas dan otomatis menyesuaikan lebar penuh layar device */
          * {
             box-sizing: border-box;
             margin: 0;
@@ -30,7 +28,7 @@
             flex-shrink: 0;
          }
          
-         /* WADAH TEKS JSON (Dibuat hemat ruang di mobile) */
+         /* WADAH TEKS JSON (Otomatis 100% mengikuti lebar layar device Anda) */
          #output-json {
             background: #111;
             color: #00ff00;
@@ -38,19 +36,18 @@
             border-radius: 5px;
             font-family: monospace;
             font-size: 12px;
-            max-width: 650px;
+            width: 100%; /* Lebar penuh otomatis menyesuaikan device */
             overflow: auto;
             margin-bottom: 15px;
             line-height: 1.4;
             border: 1px solid #333;
-            max-height: 18vh; /* Batas tinggi porsi teks log agar peta bisa mendominasi */
+            max-height: 18vh; /* Batas tinggi porsi teks log di HP */
             flex-shrink: 0;
          }
          
-         /* KONTANER PETA (Menguasai 80% dari sisa ruang konten aktif di mobile) */
+         /* KONTANER PETA (Otomatis 100% mengikuti lebar layar device & menguasai 80% porsi area vertikal di HP) */
          #map {
-            width: 100%;
-            max-width: 650px;
+            width: 100%; /* Lebar penuh otomatis menyesuaikan device */
             height: 68vh; /* Mengatur porsi tinggi peta agar mendominasi layar HP */
             background-color: #eee;
             flex-grow: 1;
@@ -58,10 +55,13 @@
             border-radius: 4px;
          }
 
-         /* Mengembalikan ke ukuran kaku default sukses Anda jika dibuka di Laptop / PC */
+         /* Penyesuaian otomatis jika dibuka di Laptop / PC desktop */
          @media (min-width: 768px) {
+            body {
+               padding: 20px; /* Padding lebih luas untuk desktop */
+            }
             #map {
-               height: 450px; 
+               height: 500px; /* Tinggi proporsional untuk desktop */
                flex-grow: 0;
             }
             #output-json {
@@ -80,7 +80,7 @@
       <!-- WADAH KHUSUS MENAMPILKAN DATA JSON DI BAWAH BARIS STATUS -->
       <pre id="output-json">Memanggil log teks IoT Firebase...</pre>
       
-      <!-- Kontainer Peta sesuai ukuran sukses Anda -->
+      <!-- Kontainer Peta otomatis menyesuaikan lebar device -->
       <div id = "map"></div>
       
       <script>         
@@ -163,10 +163,15 @@
          updateMarkerDariFirebase();
          setInterval(updateMarkerDariFirebase, 3000);
 
-         // Trik memaksa layout peta ter-render utuh (mencegah blank sisa ruang) setelah halaman terbuka sempurna
+         // Trik memaksa layout peta ter-render utuh mengikuti lebar device sesaat setelah halaman terbuka sempurna
          setTimeout(function() {
             map.invalidateSize();
          }, 500);
+
+         // Otomatis menghitung ulang ukuran peta jika layar device diputar (di-rotate)
+         window.addEventListener('resize', function() {
+            map.invalidateSize();
+         });
       </script>
    </body>   
 </html>
