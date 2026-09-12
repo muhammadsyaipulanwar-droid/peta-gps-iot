@@ -1,14 +1,18 @@
 <!DOCTYPE html>
 <html>
    <head>
-      <title>Menampilkan Marker Pada Map</title>
+      <title>Menampilkan Marker Pada Map - Live Firebase</title>
       <link rel = "stylesheet" href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
       <script src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
    </head>
  
-   <body>
-      <h2>MalasNgoding.com - Menampilkan Marker Pada Map</h2>
-      <div id = "map" style = "width: 650px; height: 450px"></div>
+   <body style="font-family: Arial, sans-serif; padding: 20px;">
+      <h2>Monitoring Multi-Client GPS Pendaki</h2>
+      <p style="color: #666; font-size: 14px;">Status: Mengambil data real-time dari Firebase IoT...</p>
+      
+      <!-- Kontainer Peta sesuai ukuran sukses Anda -->
+      <div id = "map" style = "width: 650px; height: 450px; background-color: #eee;"></div>
+      
       <script>         
          var mapOptions = {
             center: [-6.2293796, 106.6647002],
@@ -16,11 +20,72 @@
          }
  
          var map = new L.map('map', mapOptions);            
-         var layer = new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');               
+         var layer = new L.TileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');               
          map.addLayer(layer);
  
-         var marker = L.marker([-6.232228, 106.847793]).addTo(map);
- 
+         // Alamat URL Firebase JSON milik Anda
+         const urlJSON = "https://digimon-iot-8fe36-default-rtdb.firebaseio.com/pendaki.json";
+
+         // Objek memori untuk menyimpan marker agar tidak duplikat di peta saat refresh
+         const markers = {};
+
+         async function updateMarkerDariFirebase() {
+            try {
+                // Sesuai trik andalan Anda: bypass cache fetch agar data selalu update tiap 3 detik
+                const respon = await fetch(`${urlJSON}?nocache=${new Date().getTime()}`);
+                const data = await respon.json();
+                
+                if (data) {
+                    let adaMarkerBaru = false;
+
+                    // Lakukan perulangan otomatis membaca setiap id_1, id_2, dst di Firebase
+                    Object.keys(data).forEach((idKey) => {
+                        const item = data[idKey];
+                        
+                        // Konversi server timestamp menjadi waktu lokal Indonesia (Sesuai fungsi sukses Anda)
+                        let waktuLokal = "Tidak Terdeteksi";
+                        if (item.last_online) {
+                            const ts = parseInt(item.last_online);
+                            waktuLokal = !isNaN(ts) ? new Date(ts).toLocaleString('id-ID') : item.last_online;
+                        }
+
+                        // Mengambil data koordinat numerik asli
+                        const lat = parseFloat(item.latitude);
+                        const lng = parseFloat(item.longitude);
+
+                        // Gambar ke peta hanya jika data koordinatnya valid angka
+                        if (!isNaN(lat) && !isNaN(lng)) {
+                            const isiPopup = `<b>📌 ID: ${idKey}</b><br>Latitude: ${lat}<br>Longitude: ${lng}<br>Update: ${waktuLokal}`;
+                            
+                            if (markers[idKey]) {
+                                // JIKA MARKER SUDAH ADA: Perbarui posisi koordinat dan teks balonnya saja
+                                markers[idKey].setLatLng([lat, lng]);
+                                markers[idKey].getPopup().setContent(isiPopup);
+                            } else {
+                                // JIKA MARKER BARU: Buat objek penanda baru di peta
+                                markers[idKey] = L.marker([lat, lng]).addTo(map)
+                                    .bindPopup(isiPopup);
+                                adaMarkerBaru = true;
+                            }
+                        }
+                    });
+
+                    // Fitur Opsional Otomatis: Mengatur tingkat Zoom kamera peta secara dinamis
+                    // agar seluruh titik koordinat pendaki yang aktif muat tampil dalam satu layar kotak peta
+                    const markerArray = Object.values(markers);
+                    if (markerArray.length > 0 && (adaMarkerBaru || map.getZoom() === 10)) {
+                        const group = new L.featureGroup(markerArray);
+                        map.fitBounds(group.getBounds().pad(0.2));
+                    }
+                }
+            } catch (e) {
+                console.error("Gagal memperbarui peta dari Firebase:", e);
+            }
+         }
+
+         // Jalankan fungsi pembacaan data secara otomatis per 3 detik sekali secara real-time
+         updateMarkerDariFirebase();
+         setInterval(updateMarkerDariFirebase, 3000);
       </script>
    </body>   
 </html>
