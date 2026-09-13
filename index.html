@@ -69,6 +69,42 @@
                max-height: none;
             }
          }
+
+         /* DESAIN LOGO PENANDA BERUPA BALON TEKS NAMA ID DI ATAS PETA */
+         .custom-pin-logo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+         }
+
+         .label-id {
+            background-color: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            font-family: monospace;
+            white-space: nowrap;
+            border: 1px solid #fff;
+            box-shadow: 0px 2px 5px rgba(0,0,0,0.4);
+            transform: translateY(-4px); /* Menggeser posisi teks sedikit ke atas */
+         }
+
+         /* DESAIN TITIK BULATAN INTI DI KOORDINAT */
+         .dot-inti {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 0 4px rgba(0,0,0,0.5);
+         }
+
+         /* PEMBEDA WARNA DOT INTI BERDASARKAN ID */
+         .dot-merah { background-color: #ff0000; }
+         .dot-hijau { background-color: #00ff00; }
+         .dot-biru  { background-color: #0000ff; }
       </style>
    </head>
  
@@ -133,13 +169,32 @@
                         if (!isNaN(lat) && !isNaN(lng)) {
                             const isiPopup = `<b>📌 ID CLIENT: ${idKey}</b><br>Latitude: ${lat}<br>Longitude: ${lng}<br>Update: ${waktuLokal}`;
                             
+                            // MENENTUKAN KELAS WARNA TITIK BERDASARKAN NAMA ID
+                            let kelasWarnaDot = "dot-biru"; 
+                            const namaID = idKey.toLowerCase();
+                            
+                            if (namaID.includes("id_1") || namaID === "1") {
+                                kelasWarnaDot = "dot-merah";
+                            } else if (namaID.includes("id_2") || namaID === "2") {
+                                kelasWarnaDot = "dot-hijau";
+                            }
+
+                            // LOGIKA MEMBUAT LOGO TEKS DI ATAS MARKER SECARA DINAMIS
+                            const customIcon = L.divIcon({
+                                className: 'custom-pin-logo',
+                                html: `<div class="label-id">${idKey.toUpperCase()}</div><div class="dot-inti ${kelasWarnaDot}"></div>`,
+                                iconSize:,
+                                iconAnchor: [30, 35] // Mengunci poros tengah koordinat tepat berada di bulatan dot-inti
+                            });
+
                             if (markers[idKey]) {
-                                // JIKA ID_1 atau ID_2 SUDAH ADA: Geser posisinya masing-masing tanpa mengganggu ID lain
+                                // JIKA ID SUDAH ADA: Geser koordinat posisi & perbarui teks logo serta popupnya
                                 markers[idKey].setLatLng([lat, lng]);
+                                markers[idKey].setIcon(customIcon);
                                 markers[idKey].getPopup().setContent(isiPopup);
                             } else {
-                                // JIKA ID BARU MUNCUL: Gambar objek marker terpisah untuk masing-masing ID
-                                markers[idKey] = L.marker([lat, lng]).addTo(map)
+                                // JIKA ID BARU MUNCUL: Buat objek marker balon teks logo baru di atas peta
+                                markers[idKey] = L.marker([lat, lng], { icon: customIcon }).addTo(map)
                                     .bindPopup(isiPopup);
                             }
                         }
