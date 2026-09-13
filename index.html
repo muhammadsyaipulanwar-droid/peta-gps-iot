@@ -2,9 +2,7 @@
 <html>
    <head>
       <title>Menampilkan 2 Marker Dari Firebase</title>
-      <!-- PENAMBAHAN TAG VIEWPORT UNTUK OPTIMALISASI LAYAR HP -->
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      
       <link rel = "stylesheet" href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
       <script src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
       
@@ -31,7 +29,7 @@
             flex-shrink: 0;
          }
          
-         /* WADAH TEKS JSON (Otomatis 100% mengikuti lebar layar device Anda) */
+         /* WADAH TEKS LOG (Otomatis 100% mengikuti lebar layar device Anda) */
          #output-json {
             background: #111;
             color: #00ff00;
@@ -42,7 +40,7 @@
             width: 100%; /* Lebar penuh otomatis menyesuaikan device */
             overflow: auto;
             margin-bottom: 15px;
-            line-height: 1.4;
+            line-height: 1.5;
             border: 1px solid #333;
             max-height: 18vh; /* Batas tinggi porsi teks log di HP */
             flex-shrink: 0;
@@ -80,14 +78,14 @@
          <p style="color: #666; font-size: 14px; margin-bottom: 5px;">Status: Menampilkan Seluruh Client Aktif Berdampingan...</p>
       </div>
       
-      <!-- WADAH KHUSUS MENAMPILKAN DATA JSON DI BAWAH BARIS STATUS -->
+      <!-- WADAH KHUSUS MENAMPILKAN DATA LOG DI BAWAH BARIS STATUS -->
       <pre id="output-json">Memanggil log teks IoT Firebase...</pre>
       
       <!-- Kontainer Peta otomatis menyesuaikan lebar device -->
       <div id = "map"></div>
       
       <script>         
-         // Menggunakan tingkat Zoom 5 (Lebih Luas) agar posisi ID_1 dan ID_2 yang berjauhan tetap terlihat bersamaan
+         // TINGKAT ZOOM DIUBAH MENJADI 15 UNTUK PANDANGAN LEBIH DETAIL DAN DEKAT
          var mapOptions = {
             center: [-6.2088, 106.8456],
             zoom: 15
@@ -110,7 +108,7 @@
                 const data = await respon.json();
                 
                 if (data) {
-                    let dataTerkonversi = {};
+                    let teksLogBersih = "";
 
                     // Loop otomatis membaca SATU PER SATU semua ID (id_1, id_2, dll) secara mandiri
                     Object.keys(data).forEach((idKey) => {
@@ -127,12 +125,9 @@
                         const lat = parseFloat(item.latitude);
                         const lng = parseFloat(item.longitude);
 
-                        // Masukkan ke struktur objek baru untuk dicetak sebagai teks JSON bersih
-                        dataTerkonversi[idKey] = {
-                            "latitude": lat,
-                            "longitude": lng,
-                            "waktu_update": waktuLokal
-                        };
+                        // MENYUSUN TEKS LOG BERSIH TANPA SIMBOL {} DAN MENGGABUNGKAN BARIS SESUAI PERMINTAAN
+                        teksLogBersih += `[${idKey.toUpperCase()}] Lat: ${lat}, Lng: ${lng}\n`;
+                        teksLogBersih += `└─ Update: ${waktuLokal}\n\n`;
 
                         // Gambar ke peta secara terpisah jika datanya valid angka
                         if (!isNaN(lat) && !isNaN(lng)) {
@@ -150,8 +145,8 @@
                         }
                     });
 
-                    // CETAK DATA JSON TERKONVERSI TEPAT DI BAWAH BARIS STATUS
-                    document.getElementById("output-json").innerText = JSON.stringify(dataTerkonversi, null, 4);
+                    // CETAK TEKS LOG BERSIH TEPAT DI BAWAH BARIS STATUS
+                    document.getElementById("output-json").innerText = teksLogBersih.trim();
 
                 } else {
                     document.getElementById("output-json").innerText = "Database Terhubung, tetapi kosong.";
