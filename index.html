@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
    <head>
-      <title>Menampilkan Marker & Status SOS Dari Firebase</title>
+      <title>Menampilkan 2 Marker Dari Firebase</title>
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <link rel = "stylesheet" href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
       <script src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -19,7 +19,7 @@
             padding: 15px;
             height: 100vh;
             display: flex;
-            flex-direction: column; /* Menyusun konten atas-bawah secara HP */
+            flex-direction: column; /* Menyusun konten atas-bawah secara vertikal di HP */
             overflow: hidden;
             background-color: #fff;
          }
@@ -37,62 +37,40 @@
             border-radius: 5px;
             font-family: monospace;
             font-size: 12px;
-            width: 100%; 
+            width: 100%; /* Lebar penuh otomatis menyesuaikan device */
             overflow: auto;
             margin-bottom: 15px;
             line-height: 1.5;
             border: 1px solid #333;
             max-height: 18vh; /* Batas tinggi porsi teks log di HP */
             flex-shrink: 0;
-            transition: background-color 0.3s ease, border-color 0.3s ease;
-         }
-
-         /* 🌟 STYLE EFEK BERKEDIP JIKA STATUS CLIENT MEMILIKI BAHAYA (SOS) */
-         .log-bahaya-aktif {
-            background-color: #550000 !important; 
-            color: #ff3333 !important; 
-            border: 2px solid #ff0000 !important;
-            animation: kedipMerah 1s infinite alternate;
-         }
-
-         @keyframes kedipMerah {
-            from { border-color: #ff0000; box-shadow: 0 0 5px #ff0000; }
-            to { border-color: #330000; box-shadow: 0 0 0px #330000; }
-         }
-
-         /* 🌟 STYLE ICON LINGKARAN SOS MERAH BERKEDIP PADA PETA */
-         .sos-marker-pulsa {
-            background: #ff3333;
-            border: 2px solid #ffffff;
-            border-radius: 50%;
-            box-shadow: 0 0 0 0 rgba(255, 51, 51, 1);
-            animation: pulsa-merah 1.2s infinite;
-         }
-
-         @keyframes pulsa-merah {
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 51, 51, 0.7); }
-            70% { transform: scale(1); box-shadow: 0 0 0 12px rgba(255, 51, 51, 0); }
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 51, 51, 0); }
+            transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
          }
          
-         /* KONTANER PETA */
+         /* 🌟 STYLE LOG BERKEDIP MERAH JIKA LOGIKA SOS AKTIF */
+         .log-bahaya-aktif {
+            background-color: #4a0000 !important;
+            color: #ff4d4d !important;
+            border: 1px solid #ff0000 !important;
+         }
+         
+         /* KONTANER PETA (Otomatis 100% mengikuti lebar layar device & menguasai 80% porsi area vertikal di HP) */
          #map {
-            width: 100%; 
+            width: 100%; /* Lebar penuh otomatis menyesuaikan device */
             height: 68vh; /* Mengatur porsi tinggi peta agar mendominasi layar HP */
             background-color: #eee;
             flex-grow: 1;
             border: 1px solid #ccc;
             border-radius: 4px;
-            z-index: 1;
          }
 
-         /* Penyesuaian otomatis jika dibuka di PC desktop */
+         /* Penyesuaian otomatis jika dibuka di Laptop / PC desktop */
          @media (min-width: 768px) {
             body {
-               padding: 20px; 
+               padding: 20px; /* Padding lebih luas untuk desktop */
             }
             #map {
-               height: 500px; 
+               height: 500px; /* Tinggi proporsional untuk desktop */
                flex-grow: 0;
             }
             #output-json {
@@ -108,16 +86,16 @@
          <p style="color: #666; font-size: 14px; margin-bottom: 5px;">Status: Menampilkan Seluruh Client Aktif Berdampingan...</p>
       </div>
       
-      <!-- WADAH TEKS LOG IOT -->
+      <!-- WADAH KHUSUS MENAMPILKAN DATA LOG DI BAWAH BARIS STATUS -->
       <pre id="output-json">Memanggil log teks IoT Firebase...</pre>
       
-      <!-- Kontainer Peta -->
-      <div id="map"></div>
+      <!-- Kontainer Peta otomatis menyesuaikan lebar device -->
+      <div id = "map"></div>
 <!-- =========================================================================
-                    BATAS AWAL BAGIAN 2 - LOGIKA JAVASCRIPT
+                    BATAS AWAL BAGIAN 2 - JAVASCRIPT AMAN
      ========================================================================= -->
       <script>         
-         // Inisialisasi peta dengan tingkat zoom 18 untuk detail maksimal
+         // TINGKAT ZOOM DIUBAH MENJADI 18 UNTUK DETAIL MAKSIMAL
          var mapOptions = {
             center: [-2.9156867, 115.1874867],
             zoom: 18
@@ -141,7 +119,7 @@
                 
                 if (data) {
                     let teksLogBersih = "";
-                    let adaSinyalBahayaGlobal = false; // Penanda untuk memicu kedip merah pada wadah log
+                    let adaSinyalBahayaGlobal = false; // Penanda untuk memicu warna merah pada wadah log
 
                     // Loop otomatis membaca SATU PER SATU semua ID (id_1, id_2, dll) secara mandiri
                     Object.keys(data).forEach((idKey) => {
@@ -158,7 +136,7 @@
                         const lat = parseFloat(item.latitude);
                         const lng = parseFloat(item.longitude);
 
-                        // Menangkap data baterai dari Firebase
+                        // MENANGKAP DATA STRING BATERAI DARI FIREBASE
                         let infoBateraiLengkap = "Tidak Ada Data";
                         if (item.baterai !== undefined) {
                             infoBateraiLengkap = item.baterai;
@@ -166,74 +144,53 @@
                             infoBateraiLengkap = item.battery;
                         }
 
-                        // Menangkap data status SOS baru ("aman" / "bahaya")
-                        let statusSOS = "aman"; 
+                        // 🌟 MENANGKAP DATA STATUS SOS DARI FIREBASE ("aman" / "bahaya")
+                        let statusSOS = "aman";
                         if (item.sos !== undefined) {
                             statusSOS = item.sos;
                         }
 
-                        // Jika ada minimal satu client berstatus bahaya, tandai alarm global aktif
+                        // Jika salah satu pendaki berstatus bahaya, tandai background log
                         if (statusSOS === "bahaya") {
                             adaSinyalBahayaGlobal = true;
                         }
 
-                        // Menyusun teks log bersih (Ditambah Info Darurat SOS)
-                        const tandaPeringatan = (statusSOS === "bahaya") ? "⚠️ [DARURAT - SOS!]" : "[Aman]";
-                        teksLogBersih += `[${idKey.toUpperCase()}] Lat: ${lat}, Lng: ${lng} | Bat: ${infoBateraiLengkap}% | SOS: ${tandaPeringatan}\n`;
+                        // MENYUSUN TEKS LOG BERSIH SESUAI FORMAT REKUES (Ditambah teks info SOS)
+                        const labelSOS = (statusSOS === "bahaya") ? "⚠️ [BAHAYA]" : "[Aman]";
+                        teksLogBersih += `[${idKey.toUpperCase()}] Lat: ${lat}, Lng: ${lng} | Bat: ${infoBateraiLengkap}% | SOS: ${labelSOS}\n`;
                         teksLogBersih += `└─ Update: ${waktuLokal}\n\n`;
 
                         // Gambar ke peta secara terpisah jika datanya valid angka
                         if (!isNaN(lat) && !isNaN(lng)) {
-                            
-                            // Desain teks balon popup di peta
-                            let teksPopupSOS = `<span style="color: green; font-weight: bold;">✅ AMAN</span>`;
-                            let opsiIconKustom = null; // Default pin biru Leaflet
-
+                            // 🌟 DESAIN STRUKTUR TEKS POPUP PETA SINKRON REAL-TIME
+                            let teksPeringatanPopup = `<span style="color: green; font-weight: bold;">✓ STATUS AMAN</span>`;
                             if (statusSOS === "bahaya") {
-                                teksPopupSOS = `<span style="color: red; font-weight: bold; background: yellow; padding: 2px 5px; border-radius: 3px; animation: blinker 1s linear infinite;">⚠️ DARURAT SOS (BUTUH BANTUAN!)</span>
-                                <style>@keyframes blinker { 50% { opacity: 0; } }</style>`;
-                                
-                                // Membuat marker lingkaran berkedip merah (divIcon) ukuran 16x16 pixel dengan posisi jangkar pas di tengah (8,8)
-                                opsiIconKustom = L.divIcon({
-                                    className: 'sos-marker-pulsa',
-                                    iconSize:,
-                                    iconAnchor: [8, 8]
-                                });
+                                teksPeringatanPopup = `<span style="color: red; font-weight: bold; background: #ffeeee; padding: 2px 5px; border: 1px solid red; border-radius: 3px;">🚨 DARURAT SOS (BUTUH BANTUAN!)</span>`;
                             }
 
                             const isiPopup = `<b>📌 ID CLIENT: ${idKey.toUpperCase()}</b><br>
-                                              Status: ${teksPopupSOS}<br>
+                                              Kondisi: ${teksPeringatanPopup}<br>
                                               Latitude: ${lat}<br>
                                               Longitude: ${lng}<br>
                                               Baterai: ${infoBateraiLengkap}%<br>
                                               Update: ${waktuLokal}`;
                             
                             if (markers[idKey]) {
-                                // Jika ID sudah ada di peta: Geser kordinatnya dan perbarui popup-nya
+                                // JIKA ID_1 atau ID_2 SUDAH ADA: Geser posisinya masing-masing tanpa mengganggu ID lain
                                 markers[idKey].setLatLng([lat, lng]);
                                 markers[idKey].getPopup().setContent(isiPopup);
-                                
-                                // Ganti wujud ikon marker secara dinamis berdasarkan status SOS terkini
-                                if (opsiIconKustom) {
-                                    markers[idKey].setIcon(opsiIconKustom);
-                                } else {
-                                    markers[idKey].setIcon(new L.Icon.Default());
-                                }
                             } else {
-                                // Jika ID baru muncul di database: Buat objek marker barunya
-                                if (opsiIconKustom) {
-                                    markers[idKey] = L.marker([lat, lng], {icon: opsiIconKustom}).addTo(map).bindPopup(isiPopup);
-                                } else {
-                                    markers[idKey] = L.marker([lat, lng]).addTo(map).bindPopup(isiPopup);
-                                }
+                                // JIKA ID BARU MUNCUL: Gunakan pin bawaan Leaflet standar agar 100% aman anti-error
+                                markers[idKey] = L.marker([lat, lng]).addTo(map)
+                                    .bindPopup(isiPopup);
                             }
                         }
                     });
 
-                    // Cetak teks log bersih ke elemen pre
+                    // CETAK TEKS LOG BERSIH TEPAT DI BAWAH BARIS STATUS
                     document.getElementById("output-json").innerText = teksLogBersih.trim();
 
-                    // Reaksi efek kedip merah pada kotak log hitam
+                    // 🌟 PERUBAHAN WARNA LOG BOX SECARA DINAMIS
                     const elemenLog = document.getElementById("output-json");
                     if (adaSinyalBahayaGlobal) {
                         elemenLog.classList.add("log-bahaya-aktif");
