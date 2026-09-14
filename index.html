@@ -125,13 +125,21 @@
                         const lat = parseFloat(item.latitude);
                         const lng = parseFloat(item.longitude);
 
-                        // MENYUSUN TEKS LOG BERSIH TANPA SIMBOL {} DAN MENGGABUNGKAN BARIS SESUAI PERMINTAAN
-                        teksLogBersih += `[${idKey.toUpperCase()}] Lat: ${lat}, Lng: ${lng}\n`;
+                        // MENANGKAP DATA STRING BATERAI BARU DARI FIREBASE
+                        let infoBateraiLengkap = "Tidak Ada Data";
+                        if (item.baterai !== undefined) {
+                            infoBateraiLengkap = item.baterai;
+                        } else if (item.battery !== undefined) {
+                            infoBateraiLengkap = item.battery;
+                        }
+
+                        // MENYUSUN TEKS LOG BERSIH SESUAI FORMAT REKUES
+                        teksLogBersih += `[${idKey.toUpperCase()}] Lat: ${lat}, Lng: ${lng} | Bat: ${infoBateraiLengkap}\n`;
                         teksLogBersih += `└─ Update: ${waktuLokal}\n\n`;
 
                         // Gambar ke peta secara terpisah jika datanya valid angka
                         if (!isNaN(lat) && !isNaN(lng)) {
-                            const isiPopup = `<b>📌 ID CLIENT: ${idKey}</b><br>Latitude: ${lat}<br>Longitude: ${lng}<br>Update: ${waktuLokal}`;
+                            const isiPopup = `<b>📌 ID CLIENT: ${idKey}</b><br>Latitude: ${lat}<br>Longitude: ${lng}<br>Baterai: ${infoBateraiLengkap}<br>Update: ${waktuLokal}`;
                             
                             if (markers[idKey]) {
                                 // JIKA ID_1 atau ID_2 SUDAH ADA: Geser posisinya masing-masing tanpa mengganggu ID lain
