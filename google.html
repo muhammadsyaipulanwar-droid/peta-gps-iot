@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Roboto, Arial, sans-serif; }
+        body { background: #ffffff; color: #202124; display: flex; flex-direction: column; min-height: 100vh; }
+        
+        /* ==================== SCREEN 1: GOOGLE HOME ==================== */
+        .google-home { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+        .logo { max-width: 272px; height: auto; margin-bottom: 30px; }
+        .search-box-container { width: 100%; max-width: 584px; position: relative; margin-bottom: 30px; }
+        .search-box { width: 100%; height: 46px; padding: 0 45px 0 20px; font-size: 16px; border: 1px solid #dfe1e5; border-radius: 24px; outline: none; box-shadow: none; transition: box-shadow 0.2s; }
+        .search-box:hover, .search-box:focus { box-shadow: 0 1px 6px rgba(32,33,36,0.28); border-color: rgba(223,225,229,0); }
+        .search-btn { background: #f8f9fa; border: 1px solid #f8f9fa; border-radius: 4px; color: #3c4043; font-size: 14px; margin: 11px 4px; padding: 0 16px; line-height: 27px; height: 36px; cursor: pointer; text-align: center; }
+        .search-btn:hover { border: 1px solid #dadce0; color: #202124; }
+
+        /* ==================== SCREEN 2: SEARCH RESULTS ==================== */
+        .hidden { display: none !important; }
+        .nav-bar { display: flex; align-items: center; padding: 15px 30px; border-bottom: 1px solid #ebebeb; width: 100%; gap: 20px; }
+        .logo-mini { width: 92px; height: auto; cursor: pointer; }
+        .search-box-mini-container { flex: 1; max-width: 692px; }
+        .search-box-mini { width: 100%; height: 44px; padding: 0 20px; font-size: 16px; border: 1px solid #dfe1e5; border-radius: 24px; outline: none; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        
+        .main-content { padding: 20px 30px; display: flex; flex-direction: column; align-items: flex-start; width: 100%; max-width: 1200px; margin: 0 auto; }
+        .stats-text { font-size: 14px; color: #70757a; margin-bottom: 20px; }
+        
+        /* Widget Dadu Google */
+        .google-widget { width: 100%; max-width: 652px; border: 1px solid #dadce0; border-radius: 8px; padding: 16px; background: #ffffff; box-shadow: 0 1px 3px rgba(23,23,23,0.24); text-align: center; margin-bottom: 20px; position: relative; }
+        .widget-header { text-align: left; font-size: 14px; color: #70757a; margin-bottom: 20px; }
+        .dice-display-area { background-color: #f8f9fa; border-radius: 8px; height: 180px; display: flex; justify-content: center; align-items: center; gap: 24px; margin-bottom: 16px; }
+        
+        /* Dadu */
+        .dice { width: 75px; height: 75px; background-color: #4285f4; border-radius: 12px; display: grid; grid-template: repeat(3, 1fr) / repeat(3, 1fr); padding: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.15); transition: transform 0.5s ease; }
+        #dice2 { background-color: #ea4335; }
+        .dot { background-color: white; border-radius: 50%; width: 12px; height: 12px; margin: auto; visibility: hidden; }
+        .rolling { animation: googleRoll 0.5s ease-in-out infinite; }
+        @keyframes googleRoll { 0% { transform: rotate(0deg) scale(0.9); } 50% { transform: rotate(180deg) scale(1.1); } 100% { transform: rotate(360deg) scale(0.9); } }
+        
+        .roll-btn { background-color: #1a73e8; color: white; border: none; padding: 10px 24px; font-size: 14px; font-weight: 500; border-radius: 4px; cursor: pointer; box-shadow: 0 1px 2px rgba(60,64,67,0.3); }
+        .roll-btn:hover { background-color: #1557b0; }
+        .roll-btn:disabled { background-color: #bcc1c6; cursor: not-allowed; }
+
+        /* Pola Titik Dadu 1-6 */
+        .dice[data-value="1"] .dot:nth-child(5) { visibility: visible; }
+        .dice[data-value="2"] .dot:nth-child(1), .dice[data-value="2"] .dot:nth-child(9) { visibility: visible; }
+        .dice[data-value="3"] .dot:nth-child(1), .dice[data-value="3"] .dot:nth-child(5), .dice[data-value="3"] .dot:nth-child(9) { visibility: visible; }
+        .dice[data-value="4"] .dot:nth-child(1), .dice[data-value="4"] .dot:nth-child(3), .dice[data-value="4"] .dot:nth-child(7), .dice[data-value="4"] .dot:nth-child(9) { visibility: visible; }
+        .dice[data-value="5"] .dot:nth-child(1), .dice[data-value="5"] .dot:nth-child(3), .dice[data-value="5"] .dot:nth-child(5), .dice[data-value="5"] .dot:nth-child(7), .dice[data-value="5"] .dot:nth-child(9) { visibility: visible; }
+        .dice[data-value="6"] .dot:nth-child(1), .dice[data-value="6"] .dot:nth-child(3), .dice[data-value="6"] .dot:nth-child(4), .dice[data-value="6"] .dot:nth-child(6), .dice[data-value="6"] .dot:nth-child(7), .dice[data-value="6"] .dot:nth-child(9) { visibility: visible; }
+
+        /* Hasil Pencarian Teks Tiruan */
+        .fake-result { margin-top: 15px; text-align: left; width: 100%; max-width: 600px; }
+        .fake-result h3 { color: #1a0dab; font-size: 20px; font-weight: normal; margin-bottom: 4px; cursor: pointer; }
+        .fake-result h3:hover { text-decoration: underline; }
+        .fake-result cite { color: #202124; font-style: normal; font-size: 14px; display: block; margin-bottom: 4px; }
+        .fake-result p { color: #4d5156; font-size: 14px; line-height: 1.58; }
+
+        /* Panel Admin Rahasia */
+        .admin-trigger { position: absolute; top: 0; left: 0; width: 45px; height: 45px; cursor: pointer; opacity: 0; z-index: 999; }
+        .admin-panel { margin-top: 20px; padding: 15px; border: 1px dashed #ced4da; border-radius: 8px; background: #f8f9fa; display: none; width: 100%; max-width: 652px; }
+        .admin-panel input { padding: 8px; width: 80px; text-align: center; font-size: 16px; margin-right: 10px; }
+    </style>
+</head>
+<body>
+
+    <!-- SCREEN 1: HALAMAN DEPAN GOOGLE BERANDA -->
+    <div id="screenHome" class="google-home">
+        <img class="logo" src="https://google.com" alt="Google">
+        <div class="search-box-container">
+            <input type="text" id="mainSearchInput" class="search-box" autocomplete="off" autofocus onkeydown="if(event.key === 'Enter') executeSearch()">
+        </div>
+        <div>
+            <button class="search-btn" onclick="executeSearch()">Penelusuran Google</button>
+            <button class="search-btn" onclick="executeSearch()">Saya Lagi Beruntung</button>
+        </div>
+    </div>
+
+    <!-- SCREEN 2: HALAMAN HASIL PENCARIAN GOOGLE -->
+    <div id="screenResults" class="hidden">
+        <div class="nav-bar">
+            <img class="logo-mini" src="https://google.com" alt="Google" onclick="goHome()">
+            <div class="search-box-mini-container">
+                <input type="text" id="miniSearchInput" class="search-box-mini" autocomplete="off" readonly>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="stats-text">Sekitar 142.000.000 hasil (0,35 detik)</div>
+            
+            <!-- WIDGET DADU SETTINGAN -->
+            <div class="google-widget">
+                <!-- Tombol rahasia di pojok kiri atas untuk memunculkan panel cheat -->
+                <div class="admin-trigger" onclick="toggleAdminPanel()"></div>
+                
+                <div class="widget-header">Alat pemutar dadu</div>
+                <div class="dice-display-area">
+                    <div class="dice" id="dice1" data-value="1">
+                        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+                        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+                        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+                    </div>
+                    <div class="dice" id="dice2" data-value="2">
+                        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+                        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+                        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+                    </div>
+                </div>
+                <div class="widget-controls">
+                    <button class="roll-btn" onclick="googleRoll()">Putar</button>
+                </div>
+            </div>
+
+            <!-- HASIL TEKS TIRUAN -->
+            <div class="fake-result">
+                <cite>https://google.com › game › dice</cite>
+                <h3>Putar Dadu Online - Google Games</h3>
+                <p>Gunakan alat pemutar dadu interaktif dari Google. Sempurna untuk permainan papan, menentukan pilihan cepat, atau aktivitas edukasi di kelas.</p>
+            </div>
+            <div class="fake-result" style="margin-top: 25px;">
+                <cite>https://wikipedia.org › wiki › Dadu</cite>
+                <h3>Dadu - Wikipedia bahasa Indonesia, ensiklopedia bebas</h3>
+                <p>Dadu adalah sebuah objek kecil yang umumnya berbentuk kubus yang digunakan untuk menghasilkan angka acak atau elemen acak dalam permainan.</p>
+            </div>
+
+            <!-- PANEL RAHASIA (DIBAWAH WIDGET) -->
+            <div class="admin-panel" id="panelCheat">
+                <h4>Panel Kunci Hasil Dadu Rahasia</h4>
+                <p style="font-size:11px; color:#666; margin-bottom:5px;">Masukkan angka 1-6 lokal untuk demonstrasi cepat:</p>
+                <input type="number" id="setDadu1" placeholder="Dadu 1" min="1" max="6" value="3">
+                <input type="number" id="setDadu2" placeholder="Dadu 2" min="1" max="6" value="4">
+                <span style="color: green; font-size: 13px;">Kunci Aktif</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+      // JIKA INGIN DI-REMOTE ONLINE LEWAT HP LAIN: Masukkan URL Firebase Anda di siniconst FIREBASE_URL = "";function executeSearch() {const query = document.getElementById('mainSearchInput').value.trim().toLowerCase();if (query === "") return;// Daftar kata kunci yang memicu dadu keluarconst kataKunciDadu = ["dadu", "kocok dadu", "roll dice", "putar dadu", "dice", "dadu 9"];if (kataKunciDadu.includes(query)) {document.getElementById('miniSearchInput').value = query;document.getElementById('screenHome').classList.add('hidden');document.getElementById('screenResults').classList.remove('hidden');} else {// Trik Bypass: Jika mengetik hal lain, lempar langsung ke Google Asliwindow.location.href = "google.com" + encodeURIComponent(query);}}function goHome() {document.getElementById('screenResults').classList.add('hidden');document.getElementById('screenHome').classList.remove('hidden');document.getElementById('mainSearchInput').value = "";}function toggleAdminPanel() {const panel = document.getElementById('panelCheat');panel.style.display = panel.style.display === 'block' ? 'none' : 'block';}function googleRoll() {const d1 = document.getElementById('dice1');const d2 = document.getElementById('dice2');const btn = document.querySelector('.roll-btn');btn.disabled = true;d1.classList.add('rolling');d2.classList.add('rolling');if (FIREBASE_URL !== "") {// Ambil perintah dari database remote jika diisifetch(FIREBASE_URL).then(res => res.json()).then(data => {setTimeout(() => {let a1 = data ? parseInt(data.toString().charAt(0)) : Math.floor(Math.random() * 6) + 1;let a2 = data ? parseInt(data.toString().charAt(1)) : Math.floor(Math.random() * 6) + 1;applyResult(a1, a2);}, 600);}).catch(() => { setTimeout(() => { applyResult(Math.floor(Math.random() * 6) + 1, Math.floor(Math.random() * 6) + 1); }, 600); });} else {// Gunakan input angka dari panel lokal di bawah widgetsetTimeout(() => {const a1 = parseInt(document.getElementById('setDadu1').value) || Math.floor(Math.random() * 6) + 1;const a2 = parseInt(document.getElementById('setDadu2').value) || Math.floor(Math.random() * 6) + 1;applyResult(a1, a2);}, 600);}}function applyResult(a1, a2) {const d1 = document.getElementById('dice1');const d2 = document.getElementById('dice2');const btn = document.querySelector('.roll-btn');d1.setAttribute('data-value', a1);d2.setAttribute('data-value', a2);d1.classList.remove('rolling');d2.classList.remove('rolling');btn.disabled = false;}
+      
