@@ -95,6 +95,12 @@
                 <!-- Tombol rahasia di pojok kiri atas untuk memunculkan panel cheat -->
                 <div class="admin-trigger" onclick="toggleAdminPanel()"></div>
                 
+				
+				
+				
+				
+				
+				
                 <div class="widget-header">Alat pemutar dadu</div>
                 <div class="dice-display-area">
                     <div class="dice" id="dice1" data-value="1">
@@ -136,16 +142,83 @@
         </div>
     </div>
 
-    <script>
+
+
+
+<script>
 // JIKA INGIN DI-REMOTE ONLINE LEWAT HP LAIN: Masukkan URL Firebase Anda di sini
 const FIREBASE_URL = "https://dadu-control-default-rtdb.firebaseio.com/dadu.json";
-function executeSearch() {const query = document.getElementById('mainSearchInput').value.trim().toLowerCase();if (query === "") return;
-// Daftar kata kunci yang memicu dadu keluar
-const kataKunciDadu = ["dadu", "kocok dadu", "roll dice", "putar dadu", "dice", "dadu 9"];
-if (kataKunciDadu.includes(query)) {document.getElementById('miniSearchInput').value = query;document.getElementById('screenHome').classList.add('hidden');document.getElementById('screenResults').classList.remove('hidden');} else {
-// Trik Bypass: Jika mengetik hal lain, lempar langsung ke Google Asli
-window.location.href = "google.com" + encodeURIComponent(query);}}function goHome() {document.getElementById('screenResults').classList.add('hidden');document.getElementById('screenHome').classList.remove('hidden');document.getElementById('mainSearchInput').value = "";}function toggleAdminPanel() {const panel = document.getElementById('panelCheat');panel.style.display = panel.style.display === 'block' ? 'none' : 'block';}function googleRoll() {const d1 = document.getElementById('dice1');const d2 = document.getElementById('dice2');const btn = document.querySelector('.roll-btn');btn.disabled = true;d1.classList.add('rolling');d2.classList.add('rolling');if (FIREBASE_URL !== "") {
-// Ambil perintah dari database remote jika diisi
-fetch(FIREBASE_URL).then(res => res.json()).then(data => {setTimeout(() => {let a1 = data ? parseInt(data.toString().charAt(0)) : Math.floor(Math.random() * 6) + 1;let a2 = data ? parseInt(data.toString().charAt(1)) : Math.floor(Math.random() * 6) + 1;applyResult(a1, a2);}, 600);}).catch(() => { setTimeout(() => { applyResult(Math.floor(Math.random() * 6) + 1, Math.floor(Math.random() * 6) + 1); }, 600); });} else {
-// Gunakan input angka dari panel lokal di bawah widget
-setTimeout(() => {const a1 = parseInt(document.getElementById('setDadu1').value) || Math.floor(Math.random() * 6) + 1;const a2 = parseInt(document.getElementById('setDadu2').value) || Math.floor(Math.random() * 6) + 1;applyResult(a1, a2);}, 600);}}function applyResult(a1, a2) {const d1 = document.getElementById('dice1');const d2 = document.getElementById('dice2');const btn = document.querySelector('.roll-btn');d1.setAttribute('data-value', a1);d2.setAttribute('data-value', a2);d1.classList.remove('rolling');d2.classList.remove('rolling');btn.disabled = false;}
+
+function executeSearch() {
+    const query = document.getElementById('mainSearchInput').value.trim().toLowerCase();
+    if (query === "") return;
+
+    // Daftar kata kunci yang memicu dadu keluar
+    const kataKunciDadu = ["dadu", "kocok dadu", "roll dice", "putar dadu", "dice", "dadu 9"];
+
+    if (kataKunciDadu.includes(query)) {
+        document.getElementById('miniSearchInput').value = query;
+        document.getElementById('screenHome').classList.add('hidden');
+        document.getElementById('screenResults').classList.remove('hidden');
+    } else {
+        // PERBAIKAN: Trik Bypass ke Google Asli yang benar
+        window.location.href = "https://google.com" + encodeURIComponent(query);
+    }
+}
+
+function goHome() {
+    document.getElementById('screenResults').classList.add('hidden');
+    document.getElementById('screenHome').classList.remove('hidden');
+    document.getElementById('mainSearchInput').value = "";
+}
+
+function toggleAdminPanel() {
+    const panel = document.getElementById('panelCheat');
+    panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+}
+
+function googleRoll() {
+    const d1 = document.getElementById('dice1');
+    const d2 = document.getElementById('dice2');
+    const btn = document.querySelector('.roll-btn');
+    
+    btn.disabled = true;
+    d1.classList.add('rolling');
+    d2.classList.add('rolling');
+    
+    if (FIREBASE_URL !== "") {
+        // Ambil perintah dari database remote jika diisi
+        fetch(FIREBASE_URL).then(res => res.json()).then(data => {
+            setTimeout(() => {
+                let a1 = data ? parseInt(data.toString().charAt(0)) : Math.floor(Math.random() * 6) + 1;
+                let a2 = data ? parseInt(data.toString().charAt(1)) : Math.floor(Math.random() * 6) + 1;
+                applyResult(a1, a2);
+            }, 600);
+        }).catch(() => { 
+            setTimeout(() => { applyResult(Math.floor(Math.random() * 6) + 1, Math.floor(Math.random() * 6) + 1); }, 600); 
+        });
+    } else {
+        // Gunakan input angka dari panel lokal di bawah widget
+        setTimeout(() => {
+            const a1 = parseInt(document.getElementById('setDadu1').value) || Math.floor(Math.random() * 6) + 1;
+            const a2 = parseInt(document.getElementById('setDadu2').value) || Math.floor(Math.random() * 6) + 1;
+            applyResult(a1, a2);
+        }, 600);
+    }
+}
+
+function applyResult(a1, a2) {
+    const d1 = document.getElementById('dice1');
+    const d2 = document.getElementById('dice2');
+    const btn = document.querySelector('.roll-btn');
+    
+    d1.setAttribute('data-value', a1);
+    d2.setAttribute('data-value', a2);
+    d1.classList.remove('rolling');
+    d2.classList.remove('rolling');
+    btn.disabled = false;
+}
+</script>
+</body>
+</html>
+
