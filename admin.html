@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Remote Control Dadu</title>
+    <style>
+        body { font-family: sans-serif; background: #121212; color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .box { background: #1e1e1e; padding: 30px; border-radius: 15px; text-align: center; box-shadow: 0 8px 20px rgba(0,0,0,0.5); width: 300px; border: 1px solid #333; }
+        input { width: 80%; padding: 12px; font-size: 22px; text-align: center; border-radius: 8px; border: 1px solid #444; background: #222; color: #fff; margin-bottom: 20px; font-weight: bold; }
+        button { background: #00ff88; color: #121212; border: none; padding: 12px 30px; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; width: 85%; }
+        button:hover { background: #00cc6e; }
+        .status { margin-top: 15px; font-size: 14px; color: #aaa; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h3>Dadu Remote Control</h3>
+        <p style="font-size: 12px; color: #666; margin-bottom: 20px;">Masukkan 2 digit angka (11 - 66)</p>
+        <input type="number" id="inputAngka" placeholder="Contoh: 34" min="11" max="66">
+        <br>
+        <button onclick="setAngka()">Kunci Angka Jauh</button>
+        <div class="status" id="statusText">Status: Standby</div>
+    </div>
+    <script>
+        // GANTI URL DI BAWAH INI DENGAN URL FIREBASE ANDA
+        const FIREBASE_URL = "https://dadu-control-default-rtdb.firebaseio.com/dadu.json";
+
+        function setAngka() {
+            const angka = document.getElementById('inputAngka').value;
+            const status = document.getElementById('statusText');
+            if(angka.length !== 2) { alert("Harus 2 digit!"); return; }
+            status.innerText = "Mengirim perintah...";
+            fetch(FIREBASE_URL, { method: 'PUT', body: JSON.stringify(parseInt(angka)) })
+            .then(res => {
+                if(res.ok) { status.innerHTML = `✅ Terkunci di angka: <b style='color:#00ff88'>${angka}</b>`; }
+                else { status.innerText = "❌ Gagal koneksi database."; }
+            }).catch(() => { status.innerText = "❌ Error jaringan."; });
+        }
+    </script>
+</body>
+</html>
