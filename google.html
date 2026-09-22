@@ -150,76 +150,64 @@
             </div>
         </div>
     </div>
-    <script>
+       <script>
         // URL DATABASE FIREBASE REALTIME DATABASE ANDA
         const FIREBASE_URL = "https://dadu-control-default-rtdb.firebaseio.com/dadu.json"; 
 
-		function executeSearch() {
-			// Mengambil teks yang diketik, hapus spasi di awal/akhir, dan ubah ke huruf kecil semua
-			const query = document.getElementById('mainSearchInput').value.trim().toLowerCase();
-			
-			if (query === "") return;
+        // 1. FUNGSI PENCARIAN UTAMA & HALAMAN ATAS (Sama seperti Google Asli)
+        function jalankanCari(idInput) {
+            const kataKunci = document.getElementById(idInput).value.trim().toLowerCase();
+            
+            if (kataKunci === "") return;
 
-			// SISTEM DETEKSI PINTAR:
-			// Mengecek apakah teks yang diketik mengandung kata "dadu" ATAU kata "dice"
-			if (query.includes("dadu") || query.includes("dice")) {
-				// TAMPILKAN WIDGET DADU SETTINGAN ANDA
-				document.getElementById('miniSearchInput').value = query;
-				document.getElementById('screenHome').classList.add('hidden');
-				document.getElementById('screenResults').classList.remove('hidden');
-			} else {
-				// TRIK BYPASS: Jika tidak ada kata dadu/dice, langsung lempar ke Google asli
-				window.location.href = "https://google.com" + encodeURIComponent(query);
-			}
-		}
-		
-		// Fungsi untuk memproses pencarian ulang dari kolom bagian atas
-		function executeMiniSearch() {
-			const query = document.getElementById('miniSearchInput').value.trim().toLowerCase();
-			
-			if (query === "") return;
+            // Sinkronisasi isi kedua kolom input agar seragam
+            document.getElementById('mainSearchInput').value = kataKunci;
+            document.getElementById('miniSearchInput').value = kataKunci;
 
-			// Jika ketikan baru masih mengandung kata dadu atau dice
-			if (query.includes("dadu") || query.includes("dice")) {
-				// Update input di halaman depan (opsional) dan jalankan ulang dadu
-				document.getElementById('mainSearchInput').value = query;
-				googleRoll(); // Otomatis mengocok ulang dadu dengan variasi baru
-			} else {
-				// Trik Bypass: Jika mengetik kata lain (misal: "cuaca"), langsung lempar ke Google asli
-				window.location.href = "https://google.com" + encodeURIComponent(query);
-			}
-		}
+            // Cek apakah kata kunci mengandung unsur dadu atau dice
+            if (kataKunci.includes("dadu") || kataKunci.includes("dice")) {
+                // Jika dari halaman awal, buka widget dadu
+                document.getElementById('screenHome').classList.add('hidden');
+                document.getElementById('screenResults').classList.remove('hidden');
+                // Jalankan dadu secara otomatis
+                googleRoll(); 
+            } else {
+                // BYPASS KELUAR: Jika mengetik hal lain, langsung lempar ke Google Pencarian Asli
+                window.location.href = "https://www.google.com/search?q=" + encodeURIComponent(kataKunci);
+            }
+        }
 
-
+        // 2. FUNGSI TOMBOL HAPUS / LOGO GOOGLE (Kembali ke Beranda Awal)
         function goHome() {
             document.getElementById('screenResults').classList.add('hidden');
             document.getElementById('screenHome').classList.remove('hidden');
             document.getElementById('mainSearchInput').value = "";
+            document.getElementById('miniSearchInput').value = "";
         }
 
+        // 3. FUNGSI PANEL VIP RAHASIA (Ketuk pojok kiri atas widget)
         function toggleAdminPanel() {
             const panel = document.getElementById('panelCheat');
             panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
         }
 
+        // 4. FUNGSI MEMUTAR 9 DADU & MEMBACA DATABASE
         function googleRoll() {
             const btn = document.querySelector('.roll-btn');
             btn.disabled = true;
             
-            // Mengaktifkan animasi bergetar (shake) untuk gaya dadu flat
+            // Efek getar dadu flat 2D
             for (let i = 1; i <= 9; i++) {
                 document.getElementById('dice' + i).classList.add('rolling');
             }
 
             if (FIREBASE_URL !== "") {
-                // Mengambil nilai angka total target dari server database Firebase
                 fetch(FIREBASE_URL).then(res => res.json()).then(targetTotal => {
                     setTimeout(() => {
-                        let sisaSkor = targetTotal ? parseInt(targetTotal) : 29; // Default ke nilai 29 sesuai contoh gambar jika kosong
-                        let hasilDadu = new Array(9).fill(1); // Set nilai awal minimum dadu = 1
+                        let sisaSkor = targetTotal ? parseInt(targetTotal) : 29; 
+                        let hasilDadu = new Array(9).fill(1); 
                         let totalSekarang = 9;
                         
-                        // Mendistribusikan sisa nilai secara acak agar jumlah total pas
                         let loopCount = 0;
                         while (totalSekarang < sisaSkor && loopCount < 500) {
                             let indexAcak = Math.floor(Math.random() * 9);
@@ -230,7 +218,6 @@
                             loopCount++;
                         }
 
-                        // Mengaplikasikan hasil ke masing-masing elemen dadu
                         let jumlahAkhir = 0;
                         for (let i = 1; i <= 9; i++) {
                             applyResult(i, hasilDadu[i - 1]);
@@ -240,7 +227,7 @@
                         btn.disabled = false;
                     }, 650);
                 }).catch(() => {
-                    // Proteksi jika koneksi internet terputus (diacak normal otomatis)
+                    // Jika internet putus, acak normal
                     setTimeout(() => {
                         let jumlahAkhir = 0;
                         for(let i = 1; i <= 9; i++) { 
@@ -253,7 +240,7 @@
                     }, 650);
                 });
             } else {
-                // Menggunakan input manual dari panel rahasia lokal di bawah widget
+                // Membaca panel rahasia lokal di bawah widget jika Firebase kosong
                 setTimeout(() => {
                     let sisaSkor = parseInt(document.getElementById('setDadu9').value) || 29;
                     let hasilDadu = new Array(9).fill(1);
