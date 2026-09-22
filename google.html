@@ -210,47 +210,47 @@
         }
 
         function googleRoll() {
-            const btn = document.querySelector('.roll-btn');
-            btn.disabled = true;
-            
-            // Aktifkan animasi putar pada semua 9 dadu
-            for (let i = 1; i <= 9; i++) {
-                document.getElementById('dice' + i).classList.add('rolling');
-            }
+			const btn = document.querySelector('.roll-btn');
+			btn.disabled = true;
+			
+			// Aktifkan animasi berputar untuk semua dadu
+			for (let i = 1; i <= 9; i++) {
+				document.getElementById('dice' + i).classList.add('rolling');
+			}
 
-            if (FIREBASE_URL !== "") {
-                // Mengambil urutan 9 digit angka dari Firebase (Contoh data: 123456123)
-                fetch(FIREBASE_URL).then(res => res.json()).then(data => {
-                    setTimeout(() => {
-                        let dataStr = data ? data.toString() : "";
-                        for (let i = 1; i <= 9; i++) {
-                            // Potong karakter string per digit untuk masing-masing dadu
-                            let angka = dataStr.charAt(i - 1) ? parseInt(dataStr.charAt(i - 1)) : Math.floor(Math.random() * 6) + 1;
-                            if (angka < 1 || angka > 6) angka = 1; // Proteksi agar angka tetap 1-6
-                            applyResult(i, angka);
-                        }
-                        btn.disabled = false;
-                    }, 650);
-                }).catch(() => { 
-                    // Jika jaringan putus atau database kosong, otomatis diacak normal
-                    setTimeout(() => { 
-                        for(let i = 1; i <= 9; i++) { applyResult(i, Math.floor(Math.random() * 6) + 1); }
-                        btn.disabled = false;
-                    }, 650); 
-                });
-            } else {
-                // Jika URL Firebase dikosongkan, baca dari panel rahasia lokal di bawah widget
-                setTimeout(() => {
-                    const dataStr = document.getElementById('setDadu9').value.trim();
-                    for (let i = 1; i <= 9; i++) {
-                        let angka = dataStr.charAt(i - 1) ? parseInt(dataStr.charAt(i - 1)) : Math.floor(Math.random() * 6) + 1;
-                        if (angka < 1 || angka > 6) angka = 1;
-                        applyResult(i, angka);
-                    }
-                    btn.disabled = false;
-                }, 650);
-            }
-        }
+			if (FIREBASE_URL !== "") {
+				fetch(FIREBASE_URL).then(res => res.json()).then(targetTotal => {
+					setTimeout(() => {
+						let sisaSkor = targetTotal ? parseInt(targetTotal) : 34; // Default ke 34 jika database kosong
+						let hasilDadu = new Array(9).fill(1); // Mulai semua dadu dari angka 1 (total awal = 9)
+						let totalSekarang = 9;
+						
+						// Algoritma mendistribusikan sisa skor secara acak ke 9 dadu agar pas dengan target
+						let loopCount = 0;
+						while (totalSekarang < sisaSkor && loopCount < 500) {
+							let indexAcak = Math.floor(Math.random() * 9);
+							if (hasilDadu[indexAcak] < 6) {
+								hasilDadu[indexAcak]++;
+								totalSekarang++;
+							}
+							loopCount++;
+						}
+
+						// Terapkan hasil pecahan acak tersebut ke masing-masing dadu
+						for (let i = 1; i <= 9; i++) {
+							applyResult(i, hasilDadu[i - 1]);
+						}
+						btn.disabled = false;
+					}, 650);
+				}).catch(() => {
+					// Jika koneksi gagal, acak murni secara normal
+					setTimeout(() => {
+						for(let i = 1; i <= 9; i++) { applyResult(i, Math.floor(Math.random() * 6) + 1); }
+						btn.disabled = false;
+					}, 650);
+				});
+			}
+		}
 
         function applyResult(idDadu, nilai) {
             const d = document.getElementById('dice' + idDadu);
