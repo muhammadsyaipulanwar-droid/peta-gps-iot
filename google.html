@@ -150,7 +150,7 @@
             </div>
         </div>
     </div>
-    <script>
+        <script>
         // URL DATABASE FIREBASE REALTIME DATABASE ANDA
         const FIREBASE_URL = "https://dadu-control-default-rtdb.firebaseio.com/dadu.json"; 
 
@@ -158,6 +158,7 @@
         function jalankanCari(idInput) {
             const kataKunci = document.getElementById(idInput).value.trim().toLowerCase();
             
+            // PERBAIKAN: Mengubah "query" menjadi "kataKunci" agar tidak crash
             if (kataKunci === "") return;
 
             // Sinkronisasi isi kedua kolom input agar seragam layaknya Google asli
@@ -267,5 +268,8 @@
             d.classList.remove('rolling');
         }
     </script>
+</body>
+</html>
+
 </body>
 </html>
