@@ -28,35 +28,32 @@
         .stats-text { font-size: 14px; color: #70757a; margin-bottom: 20px; }
         
         /* Widget Dadu Google */
-        .google-widget { width: 100%; max-width: 652px; border: 1px solid #dadce0; border-radius: 8px; padding: 16px; background: #ffffff; box-shadow: 0 1px 3px rgba(23,23,23,0.24); text-align: center; margin-bottom: 20px; position: relative; }
-        .widget-header { text-align: left; font-size: 14px; color: #70757a; margin-bottom: 15px; }
+        .google-widget { width: 100%; max-width: 652px; border: 1px solid #dadce0; border-radius: 8px; padding: 16px; background: #ffffff; box-shadow: 0 1px 3px rgba(23,23,23,0.24); margin-bottom: 20px; position: relative; }
+        .widget-top-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .widget-header { font-size: 16px; color: #202124; font-weight: normal; }
         
-        /* Area Tampilan Dadu (Grid untuk menampung banyak dadu agar rapi) */
-        .dice-display-area { background-color: #f8f9fa; border-radius: 8px; min-height: 220px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; padding: 20px; align-items: center; justify-items: center; }
+        /* Kotak Total Skor Khas Google */
+        .total-score-box { background: #f1f3f4; padding: 6px 16px; border-radius: 4px; font-size: 14px; color: #3c4043; font-weight: 500; }
+        .total-score-box span { font-size: 18px; color: #202124; font-weight: bold; margin-left: 5px; }
         
-        /* Desain Dadu Ukuran Kompak untuk 9 Biji */
-        .dice { width: 55px; height: 55px; background-color: #4285f4; border-radius: 8px; display: grid; grid-template: repeat(3, 1fr) / repeat(3, 1fr); padding: 5px; box-shadow: 0 3px 5px rgba(0,0,0,0.15); transition: transform 0.5s ease; }
+        /* Area Tampilan Dadu Grid */
+        .dice-display-area { background-color: #f8f9fa; border-radius: 8px; min-height: 220px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; padding: 25px; align-items: center; justify-items: center; }
         
-        /* Variasi warna dadu khas Google */
-        .dice:nth-child(even) { background-color: #ea4335; }
-        .dice:nth-child(3n) { background-color: #fabc05; }
-        .dice:nth-child(4n) { background-color: #34a853; }
+        /* Desain Dadu Isometrik 3D Google (Bentuk Rhombus) */
+        .dice { width: 56px; height: 56px; background-color: #4285f4; color: white; font-size: 24px; font-weight: bold; display: flex; align-items: center; justify-content: center; border-radius: 6px; box-shadow: 0 4px #2b66c4, 0 6px 10px rgba(0,0,0,0.15); transform: rotate(-10deg) skewX(10deg); transition: transform 0.15s ease, background-color 0.3s; position: relative; user-select: none; }
+        .dice::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 50%); border-radius: 6px; }
+
+        /* Efek Animasi Loncat Mengocok */
+        .rolling { animation: googleBounce 0.5s ease-in-out infinite alternate; }
+        @keyframes googleBounce {
+            0% { transform: translateY(0) rotate(-10deg) skewX(10deg) scale(0.95); box-shadow: 0 4px #2b66c4, 0 6px 10px rgba(0,0,0,0.15); }
+            100% { transform: translateY(-20px) rotate(15deg) skewX(-5deg) scale(1.05); box-shadow: 0 15px #2b66c4, 0 15px 15px rgba(0,0,0,0.1); }
+        }
         
-        .dot { background-color: white; border-radius: 50%; width: 9px; height: 9px; margin: auto; visibility: hidden; }
-        .rolling { animation: googleRoll 0.5s ease-in-out infinite; }
-        @keyframes googleRoll { 0% { transform: rotate(0deg) scale(0.9); } 50% { transform: rotate(180deg) scale(1.1); } 100% { transform: rotate(360deg) scale(0.9); } }
-        
+        .widget-controls { display: flex; justify-content: center; padding-top: 15px; }
         .roll-btn { background-color: #1a73e8; color: white; border: none; padding: 10px 24px; font-size: 14px; font-weight: 500; border-radius: 4px; cursor: pointer; box-shadow: 0 1px 2px rgba(60,64,67,0.3); }
         .roll-btn:hover { background-color: #1557b0; }
         .roll-btn:disabled { background-color: #bcc1c6; cursor: not-allowed; }
-
-        /* Pola Titik Dadu 1-6 */
-        .dice[data-value="1"] .dot:nth-child(5) { visibility: visible; }
-        .dice[data-value="2"] .dot:nth-child(1), .dice[data-value="2"] .dot:nth-child(9) { visibility: visible; }
-        .dice[data-value="3"] .dot:nth-child(1), .dice[data-value="3"] .dot:nth-child(5), .dice[data-value="3"] .dot:nth-child(9) { visibility: visible; }
-        .dice[data-value="4"] .dot:nth-child(1), .dice[data-value="4"] .dot:nth-child(3), .dice[data-value="4"] .dot:nth-child(7), .dice[data-value="4"] .dot:nth-child(9) { visibility: visible; }
-        .dice[data-value="5"] .dot:nth-child(1), .dice[data-value="5"] .dot:nth-child(3), .dice[data-value="5"] .dot:nth-child(5), .dice[data-value="5"] .dot:nth-child(7), .dice[data-value="5"] .dot:nth-child(9) { visibility: visible; }
-        .dice[data-value="6"] .dot:nth-child(1), .dice[data-value="6"] .dot:nth-child(3), .dice[data-value="6"] .dot:nth-child(4), .dice[data-value="6"] .dot:nth-child(6), .dice[data-value="6"] .dot:nth-child(7), .dice[data-value="6"] .dot:nth-child(9) { visibility: visible; }
 
         /* Hasil Pencarian Teks Tiruan */
         .fake-result { margin-top: 15px; text-align: left; width: 100%; max-width: 600px; }
@@ -96,66 +93,25 @@
         <div class="main-content">
             <div class="stats-text">Sekitar 142.000.000 hasil (0,35 detik)</div>
             
-            <!-- WIDGET DADU SETTINGAN (9 DADU) -->
+            <!-- WIDGET DADU SETTINGAN (9 DADU ASLI GOOGLE STYLE) -->
             <div class="google-widget">
                 <div class="admin-trigger" onclick="toggleAdminPanel()"></div>
-                <div class="widget-header">Alat pemutar dadu</div>
+                
+                <div class="widget-top-info">
+                    <div class="widget-header">Alat pemutar dadu</div>
+                    <div class="total-score-box">Total <span id="textTotalScore">9</span></div>
+                </div>
                 
                 <div class="dice-display-area">
-                    <!-- Dadu 1 -->
-                    <div class="dice" id="dice1" data-value="1">
-                        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-                        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-                        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-                    </div>
-                    <!-- Dadu 2 -->
-                    <div class="dice" id="dice2" data-value="2">
-                        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-                        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-                        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-                    </div>
-                    <!-- Dadu 3 -->
-                    <div class="dice" id="dice3" data-value="3">
-                        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-                        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-                        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-                    </div>
-                    <!-- Dadu 4 -->
-                    <div class="dice" id="dice4" data-value="4">
-                        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-                        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-                        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-                    </div>
-                    <!-- Dadu 5 -->
-                    <div class="dice" id="dice5" data-value="5">
-                        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-                        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-                        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-                    </div>
-                    <!-- Dadu 6 -->
-                    <div class="dice" id="dice6" data-value="6">
-                        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-                        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-                        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-                    </div>
-                    <!-- Dadu 7 -->
-                    <div class="dice" id="dice7" data-value="1">
-                        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-                        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-                        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-                    </div>
-                    <!-- Dadu 8 -->
-                    <div class="dice" id="dice8" data-value="2">
-                        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-                        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-                        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-                    </div>
-                    <!-- Dadu 9 -->
-                    <div class="dice" id="dice9" data-value="3">
-                        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-                        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-                        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-                    </div>
+                    <div class="dice" id="dice1">1</div>
+                    <div class="dice" id="dice2">1</div>
+                    <div class="dice" id="dice3">1</div>
+                    <div class="dice" id="dice4">1</div>
+                    <div class="dice" id="dice5">1</div>
+                    <div class="dice" id="dice6">1</div>
+                    <div class="dice" id="dice7">1</div>
+                    <div class="dice" id="dice8">1</div>
+                    <div class="dice" id="dice9">1</div>
                 </div>
                 
                 <div class="widget-controls">
@@ -170,22 +126,21 @@
             </div>
 
             <div class="admin-panel" id="panelCheat">
-                <h4>Panel Kunci Hasil Dadu Rahasia (9 Digit)</h4>
-                <p style="font-size:11px; color:#666; margin-bottom:5px;">Masukkan 9 digit angka tanpa spasi (Contoh: 123456123):</p>
-                <input type="text" id="setDadu9" placeholder="Contoh: 555555555" maxlength="9" value="123456123">
-                <span style="color: green; font-size: 13px;">Kunci 9 Dadu Aktif</span>
+                <h4>Panel Kunci Hasil Dadu Rahasia (Lokal)</h4>
+                <p style="font-size:11px; color:#666; margin-bottom:5px;">Target total nilai alternatif (9-54):</p>
+                <input type="number" id="setDadu9" placeholder="Contoh: 34" min="9" max="54" value="34">
+                <span style="color: green; font-size: 13px;">Sistem Kunci Otomatis Aktif</span>
             </div>
         </div>
     </div>
     <script>
-        // URL DATABASE FIREBASE ANDA
+        // URL DATABASE FIREBASE REALTIME DATABASE ANDA
         const FIREBASE_URL = "https://dadu-control-default-rtdb.firebaseio.com/dadu.json"; 
 
         function executeSearch() {
             const query = document.getElementById('mainSearchInput').value.trim().toLowerCase();
             if (query === "") return;
 
-            // Daftar kata kunci rahasia untuk memunculkan 9 dadu
             const kataKunciDadu = ["dadu", "kocok dadu", "roll dice", "putar dadu", "dice", "dadu 9", "9 biji dadu"];
 
             if (kataKunciDadu.includes(query)) {
@@ -194,7 +149,7 @@
                 document.getElementById('screenResults').classList.remove('hidden');
             } else {
                 // Trik Bypass Akurat: Jika mengetik hal lain, lempar langsung ke Google Asli
-                window.location.href = "https://google.com/search?q=" + encodeURIComponent(query);
+                window.location.href = "https://www.google.com/search?q=" + encodeURIComponent(query);
             }
         }
 
@@ -210,51 +165,86 @@
         }
 
         function googleRoll() {
-			const btn = document.querySelector('.roll-btn');
-			btn.disabled = true;
-			
-			// Aktifkan animasi berputar untuk semua dadu
-			for (let i = 1; i <= 9; i++) {
-				document.getElementById('dice' + i).classList.add('rolling');
-			}
+            const btn = document.querySelector('.roll-btn');
+            btn.disabled = true;
+            
+            // Aktifkan animasi berputar/membal pada dadu isometrik 3D
+            for (let i = 1; i <= 9; i++) {
+                document.getElementById('dice' + i).classList.add('rolling');
+            }
 
-			if (FIREBASE_URL !== "") {
-				fetch(FIREBASE_URL).then(res => res.json()).then(targetTotal => {
-					setTimeout(() => {
-						let sisaSkor = targetTotal ? parseInt(targetTotal) : 34; // Default ke 34 jika database kosong
-						let hasilDadu = new Array(9).fill(1); // Mulai semua dadu dari angka 1 (total awal = 9)
-						let totalSekarang = 9;
-						
-						// Algoritma mendistribusikan sisa skor secara acak ke 9 dadu agar pas dengan target
-						let loopCount = 0;
-						while (totalSekarang < sisaSkor && loopCount < 500) {
-							let indexAcak = Math.floor(Math.random() * 9);
-							if (hasilDadu[indexAcak] < 6) {
-								hasilDadu[indexAcak]++;
-								totalSekarang++;
-							}
-							loopCount++;
-						}
+            if (FIREBASE_URL !== "") {
+                // Mengambil nilai angka total dari server database Firebase
+                fetch(FIREBASE_URL).then(res => res.json()).then(targetTotal => {
+                    setTimeout(() => {
+                        let sisaSkor = targetTotal ? parseInt(targetTotal) : 34; // Default ke nilai 34 jika kosong
+                        let hasilDadu = new Array(9).fill(1); // Mulai dari nilai minimum 1
+                        let totalSekarang = 9;
+                        
+                        // Algoritma pintar mendistribusikan sisa nilai agar jumlah totalnya pas
+                        let loopCount = 0;
+                        while (totalSekarang < sisaSkor && loopCount < 500) {
+                            let indexAcak = Math.floor(Math.random() * 9);
+                            if (hasilDadu[indexAcak] < 6) {
+                                hasilDadu[indexAcak]++;
+                                totalSekarang++;
+                            }
+                            loopCount++;
+                        }
 
-						// Terapkan hasil pecahan acak tersebut ke masing-masing dadu
-						for (let i = 1; i <= 9; i++) {
-							applyResult(i, hasilDadu[i - 1]);
-						}
-						btn.disabled = false;
-					}, 650);
-				}).catch(() => {
-					// Jika koneksi gagal, acak murni secara normal
-					setTimeout(() => {
-						for(let i = 1; i <= 9; i++) { applyResult(i, Math.floor(Math.random() * 6) + 1); }
-						btn.disabled = false;
-					}, 650);
-				});
-			}
-		}
+                        // Terapkan hasil angka pecahan acak dan kalkulasi teks total akhir
+                        let jumlahAkhir = 0;
+                        for (let i = 1; i <= 9; i++) {
+                            applyResult(i, hasilDadu[i - 1]);
+                            jumlahAkhir += hasilDadu[i - 1];
+                        }
+                        document.getElementById('textTotalScore').innerText = jumlahAkhir;
+                        btn.disabled = false;
+                    }, 650);
+                }).catch(() => {
+                    // Proteksi darurat jika jaringan internet terputus (acak normal)
+                    setTimeout(() => {
+                        let jumlahAkhir = 0;
+                        for(let i = 1; i <= 9; i++) { 
+                            let acak = Math.floor(Math.random() * 6) + 1;
+                            applyResult(i, acak);
+                            jumlahAkhir += acak;
+                        }
+                        document.getElementById('textTotalScore').innerText = jumlahAkhir;
+                        btn.disabled = false;
+                    }, 650);
+                });
+            } else {
+                // Menggunakan input dari panel rahasia lokal di bawah widget
+                setTimeout(() => {
+                    let sisaSkor = parseInt(document.getElementById('setDadu9').value) || 34;
+                    let hasilDadu = new Array(9).fill(1);
+                    let totalSekarang = 9;
+                    
+                    let loopCount = 0;
+                    while (totalSekarang < sisaSkor && loopCount < 500) {
+                        let indexAcak = Math.floor(Math.random() * 9);
+                        if (hasilDadu[indexAcak] < 6) {
+                            hasilDadu[indexAcak]++;
+                            totalSekarang++;
+                        }
+                        loopCount++;
+                    }
+
+                    let jumlahAkhir = 0;
+                    for (let i = 1; i <= 9; i++) {
+                        applyResult(i, hasilDadu[i - 1]);
+                        jumlahAkhir += hasilDadu[i - 1];
+                    }
+                    document.getElementById('textTotalScore').innerText = jumlahAkhir;
+                    btn.disabled = false;
+                }, 650);
+            }
+        }
 
         function applyResult(idDadu, nilai) {
             const d = document.getElementById('dice' + idDadu);
-            d.setAttribute('data-value', nilai);
+            d.innerText = nilai;
             d.classList.remove('rolling');
         }
     </script>
