@@ -27,16 +27,16 @@
         .main-content { padding: 20px 30px; display: flex; flex-direction: column; align-items: flex-start; width: 100%; max-width: 1200px; margin: 0 auto; }
         .stats-text { font-size: 14px; color: #70757a; margin-bottom: 20px; }
         
-        /* Widget Dadu Google Persis tes.html */
-        .google-widget { width: 100%; max-width: 652px; border: 1px solid #dadce0; border-radius: 8px; background: #ffffff; box-shadow: none; margin-bottom: 20px; position: relative; overflow: hidden; }
+        /* Widget Dadu Google */
+        .google-widget { width: 100%; max-width: 652px; border: 1px solid #dadce0; border-radius: 8px; background: #ffffff; box-shadow: none; margin-bottom: 30px; position: relative; overflow: hidden; }
         .widget-inner-padding { padding: 16px; }
         .widget-header { font-size: 14px; color: #70757a; text-align: left; margin-bottom: 12px; }
         
-        /* Area Grid Dadu Flat 2D Sesuai File Tes Anda */
+        /* Area Grid Dadu Flat 2D */
         .dice-display-area { background-color: #ffffff; border: 1px solid #dadce0; border-radius: 8px; min-height: 180px; padding: 24px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; position: relative; }
         .dice-row { display: flex; justify-content: center; gap: 16px; width: 100%; }
         
-        /* Desain Kotak Dadu Flat Warna Cyan Biru */
+        /* Desain Kotak Dadu Flat */
         .dice { width: 56px; height: 56px; background-color: #00bcd4; color: white; font-size: 24px; font-weight: 500; display: flex; align-items: center; justify-content: center; border-radius: 4px; box-shadow: none; transition: transform 0.1s ease; user-select: none; }
         
         /* Bar Total Skor di Bagian Bawah Dadu */
@@ -56,14 +56,30 @@
         .roll-btn:hover { background-color: #1557b0; }
         .clear-btn { background-color: #ffffff; color: #3c4043; border: 1px solid #dadce0; padding: 10px 24px; font-size: 14px; font-weight: 500; border-radius: 4px; cursor: pointer; }
         .clear-btn:hover { background-color: #f8f9fa; }
-        .roll-btn:disabled, .clear-btn:disabled { background-color: #bcc1c6; color: #ffffff; cursor: not-allowed; }
 
-        /* Hasil Teks Pencarian Tiruan */
-        .fake-result { margin-top: 15px; text-align: left; width: 100%; max-width: 600px; }
+        /* Struktur List Hasil Pencarian Panjang Khas Google */
+        .results-container { width: 100%; max-width: 652px; display: flex; flex-direction: column; gap: 26px; margin-bottom: 40px; }
+        .fake-result { text-align: left; width: 100%; }
+        .fake-result cite { color: #202124; font-style: normal; font-size: 14px; display: block; margin-bottom: 4px; }
         .fake-result h3 { color: #1a0dab; font-size: 20px; font-weight: normal; margin-bottom: 4px; cursor: pointer; }
         .fake-result h3:hover { text-decoration: underline; }
-        .fake-result cite { color: #202124; font-style: normal; font-size: 14px; display: block; margin-bottom: 4px; }
         .fake-result p { color: #4d5156; font-size: 14px; line-height: 1.58; }
+
+        /* Navigasi Halaman Google Bawah (Gooooooogle) */
+        .google-pagination { display: flex; justify-content: center; align-items: center; gap: 0; width: 100%; max-width: 652px; padding: 30px 0; border-top: 1px solid #ebebeb; margin-top: 20px; }
+        .nav-letter { font-family: 'Product Sans', Roboto, sans-serif; font-size: 40px; font-weight: bold; line-height: 1; }
+        .letter-g { color: #4285F4; }
+        .letter-o-red { color: #EA4335; }
+        .letter-o-yellow { color: #FBBC05; }
+        .letter-l { color: #34A853; }
+        .letter-e { color: #EA4335; }
+        
+        .page-numbers-container { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 25px; cursor: pointer; text-decoration: none; color: #4285F4; font-size: 13px; font-weight: normal; }
+        .page-numbers-container span { margin-top: 5px; }
+        .page-active { color: #202124; cursor: default; pointer-events: none; }
+        .page-active span { font-weight: bold; }
+        
+        .nav-next { color: #4285F4; font-size: 13px; text-decoration: none; display: flex; flex-direction: column; align-items: center; margin-left: 15px; cursor: pointer; }
 
         /* Panel Rahasia */
         .admin-trigger { position: absolute; top: 0; left: 0; width: 45px; height: 45px; cursor: pointer; opacity: 0; z-index: 999; }
@@ -99,7 +115,7 @@
         <div class="main-content">
             <div class="stats-text">Sekitar 142.000.000 hasil (0,35 detik)</div>
             
-            <!-- WIDGET DADU SETTINGAN (9 DADU PERSIS SEPERTI TES.HTML) -->
+            <!-- WIDGET DADU SETTINGAN (9 DADU FLAT 2D) -->
             <div class="google-widget">
                 <div class="admin-trigger" onclick="toggleAdminPanel()"></div>
                 
@@ -107,7 +123,7 @@
                     <div class="widget-header">Lempar dadu</div>
                     
                     <div class="dice-display-area">
-                        <!-- Baris 1: 5 Dadu -->
+                        <!-- Baris Atas: 5 Dadu -->
                         <div class="dice-row">
                             <div class="dice" id="dice1">1</div>
                             <div class="dice" id="dice2">3</div>
@@ -116,7 +132,7 @@
                             <div class="dice" id="dice5">5</div>
                         </div>
                         
-                        <!-- Baris 2: 4 Dadu -->
+                        <!-- Baris Bawah: 4 Dadu -->
                         <div class="dice-row">
                             <div class="dice" id="dice6">6</div>
                             <div class="dice" id="dice7">4</div>
@@ -138,12 +154,71 @@
                 </div>
             </div>
 
-            <div class="fake-result">
-                <cite>https://google.com › game › dice</cite>
-                <h3>Putar Dadu Online - Google Games</h3>
-                <p>Gunakan alat pemutar dadu interaktif dari Google. Sempurna untuk permainan papan, menentukan pilihan cepat, atau aktivitas edukasi di kelas.</p>
+            <!-- DERETAN HASIL PENCARIAN ARTIKEL BAWAH YANG LENGKAP -->
+            <div class="results-container">
+                <div class="fake-result">
+                    <cite>https://google.com › game › dice</cite>
+                    <h3>Putar Dadu Online - Google Games</h3>
+                    <p>Gunakan alat pemutar dadu interaktif dari Google. Sempurna untuk permainan papan, menentukan pilihan cepat, atau aktivitas edukasi di kelas.</p>
+                </div>
+                <div class="fake-result">
+                    <cite>https://wikipedia.org › wiki › Dadu</cite>
+                    <h3>Dadu - Wikipedia bahasa Indonesia, ensiklopedia bebas</h3>
+                    <p>Dadu adalah sebuah objek kecil yang umumnya berbentuk kubus yang digunakan untuk menghasilkan angka acak atau elemen acak dalam permainan.</p>
+                </div>
+                <div class="fake-result">
+                    <cite>https://random.org › dice</cite>
+                    <h3>RANDOM.ORG - Dice Roller</h3>
+                    <p>Situs ini menyediakan layanan pengocokan dadu virtual gratis berbasis gelombang atmosfer nyata untuk memastikan keacakan mutlak yang adil.</p>
+                </div>
+                <div class="fake-result">
+                    <cite>https://google.com › store › apps</cite>
+                    <h3>Aplikasi Dadus Virtual Terbaik di Google Play Store</h3>
+                    <p>Temukan dan unduh puluhan aplikasi simulasi kocok dadu 3D terbaik untuk perangkat Android Anda lengkap dengan fitur kustomisasi warna.</p>
+                </div>
+                <div class="fake-result">
+                    <cite>https://solasido.com › alat-acak</cite>
+                    <h3>Alat Pengacak Dadu Online Praktis - Solasido</h3>
+                    <p>Solusi instan memutar dadu digital tanpa aplikasi. Cukup buka lewat browser untuk memutar hingga maksimal 10 dadu sekaligus.</p>
+                </div>
             </div>
 
+            <!-- NAVIGASI HALAMAN BAWAH GOOGLE (Gooooooogle) -->
+            <div class="google-pagination">
+                <span class="nav-letter letter-g">G</span>
+                <div class="page-numbers-container page-active">
+                    <span class="nav-letter letter-o-red">o</span>
+                    <span>1</span>
+                </div>
+                <a href="#" class="page-numbers-container" onclick="jalankanCari('miniSearchInput')">
+                    <span class="nav-letter letter-o-yellow">o</span>
+                    <span>2</span>
+                </a>
+                <a href="#" class="page-numbers-container" onclick="jalankanCari('miniSearchInput')">
+                    <span class="nav-letter letter-o-yellow">o</span>
+                    <span>3</span>
+                </a>
+                <a href="#" class="page-numbers-container" onclick="jalankanCari('miniSearchInput')">
+                    <span class="nav-letter letter-o-yellow">o</span>
+                    <span>4</span>
+                </a>
+                <a href="#" class="page-numbers-container" onclick="jalankanCari('miniSearchInput')">
+                    <span class="nav-letter letter-o-yellow">o</span>
+                    <span>5</span>
+                </a>
+                <a href="#" class="page-numbers-container" onclick="jalankanCari('miniSearchInput')">
+                    <span class="nav-letter letter-o-yellow">o</span>
+                    <span>6</span>
+                </a>
+                <span class="nav-letter letter-l">l</span>
+                <span class="nav-letter letter-e">e</span>
+                <a href="#" class="nav-next" onclick="jalankanCari('miniSearchInput')">
+                    <span style="font-size: 24px; color: #4285F4; font-weight: bold; line-height: 1;">&gt;</span>
+                    <span style="margin-top: 14px;">Berikutnya</span>
+                </a>
+            </div>
+
+            <!-- PANEL RAHASIA ADMIN LOKAL -->
             <div class="admin-panel" id="panelCheat">
                 <h4>Panel Kunci Hasil Dadu Rahasia (Lokal)</h4>
                 <p style="font-size:11px; color:#666; margin-bottom:5px;">Target total nilai keseluruhan (9-54):</p>
@@ -167,7 +242,7 @@
             document.getElementById('mainSearchInput').value = kataKunci;
             document.getElementById('miniSearchInput').value = kataKunci;
 
-            // SISTEM DETEKSI KATA KUNCI:
+            // SISTEM DETEKSI PINTAR:
             // Jika kata kunci mengandung unsur kata "dadu" atau "dice"
             if (kataKunci.includes("dadu") || kataKunci.includes("dice")) {
                 document.getElementById('screenHome').classList.add('hidden');
