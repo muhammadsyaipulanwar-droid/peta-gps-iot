@@ -10,7 +10,7 @@
         
         /* ==================== SCREEN 1: GOOGLE HOME ==================== */
         .google-home { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
-        .logo { max-width: 272px; height: auto; margin-bottom: 30px; }
+        .logo-svg { margin-bottom: 30px; display: block; }
         .search-box-container { width: 100%; max-width: 584px; position: relative; margin-bottom: 30px; }
         .search-box { width: 100%; height: 46px; padding: 0 45px 0 20px; font-size: 16px; border: 1px solid #dfe1e5; border-radius: 24px; outline: none; box-shadow: none; transition: box-shadow 0.2s; }
         .search-box:hover, .search-box:focus { box-shadow: 0 1px 6px rgba(32,33,36,0.28); border-color: rgba(223,225,229,0); }
@@ -20,7 +20,7 @@
         /* ==================== SCREEN 2: SEARCH RESULTS ==================== */
         .hidden { display: none !important; }
         .nav-bar { display: flex; align-items: center; padding: 15px 30px; border-bottom: 1px solid #ebebeb; width: 100%; gap: 20px; }
-        .logo-mini { width: 92px; height: auto; cursor: pointer; }
+        .logo-mini-container { display: flex; align-items: center; cursor: pointer; }
         .search-box-mini-container { flex: 1; max-width: 692px; }
         .search-box-mini { width: 100%; height: 44px; padding: 0 20px; font-size: 16px; border: 1px solid #dfe1e5; border-radius: 24px; outline: none; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         
@@ -29,37 +29,34 @@
         
         /* Widget Dadu Google */
         .google-widget { width: 100%; max-width: 652px; border: 1px solid #dadce0; border-radius: 8px; padding: 16px; background: #ffffff; box-shadow: 0 1px 3px rgba(23,23,23,0.24); margin-bottom: 20px; position: relative; }
-        .widget-top-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .widget-header { font-size: 16px; color: #202124; font-weight: normal; }
         
-        /* Area Tampilan Dadu Grid Sesuai Gambar */
+        /* Area Tampilan Dadu Grid Flat */
         .dice-display-area { background-color: #e8f0fe; border-radius: 8px; min-height: 200px; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px; position: relative; }
         .dice-row { display: flex; justify-content: center; gap: 15px; width: 100%; }
         
-        /* Desain Dadu Persegi Flat 2D Sesuai Gambar Anda */
+        /* Desain Dadu Persegi Flat 2D */
         .dice { width: 65px; height: 65px; background-color: #00bcd4; color: white; font-size: 26px; font-weight: bold; display: flex; align-items: center; justify-content: center; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: transform 0.1s ease; user-select: none; }
         
-        /* Kotak Total Skor di Pojok Kanan Bawah Sesuai Gambar */
+        /* Kotak Total Skor */
         .total-score-wrapper { position: absolute; bottom: 15px; right: 20px; text-align: center; }
         .total-label { font-size: 14px; color: #3c4043; font-weight: 500; }
         .total-score-box { font-size: 32px; color: #202124; font-weight: bold; line-height: 1; }
 
-        /* Efek Animasi Bergetar Saat Mengocok */
+        /* Efek Animasi Bergetar */
         .rolling { animation: googleShake 0.1s infinite alternate; }
         @keyframes googleShake {
             0% { transform: translate(2px, 1px) rotate(0deg); }
             100% { transform: translate(-1px, -2px) rotate(-1deg); }
         }
         
-        /* Tombol Lempar & Hapus Sesuai Gambar */
+        /* Tombol Kontrol */
         .widget-controls { display: flex; justify-content: center; gap: 10px; padding-top: 15px; }
         .roll-btn { background-color: #1a73e8; color: white; border: none; padding: 10px 24px; font-size: 14px; font-weight: 500; border-radius: 4px; cursor: pointer; box-shadow: 0 1px 2px rgba(60,64,67,0.3); }
         .roll-btn:hover { background-color: #1557b0; }
         .clear-btn { background-color: #f1f3f4; color: #3c4043; border: 1px solid #dadce0; padding: 10px 24px; font-size: 14px; font-weight: 500; border-radius: 4px; cursor: pointer; }
         .clear-btn:hover { background-color: #e8eaed; }
-        .roll-btn:disabled, .clear-btn:disabled { background-color: #bcc1c6; color: #ffffff; cursor: not-allowed; box-shadow: none; }
 
-        /* Hasil Pencarian Teks Tiruan */
+        /* Hasil Pencarian Tiruan */
         .fake-result { margin-top: 15px; text-align: left; width: 100%; max-width: 600px; }
         .fake-result h3 { color: #1a0dab; font-size: 20px; font-weight: normal; margin-bottom: 4px; cursor: pointer; }
         .fake-result h3:hover { text-decoration: underline; }
@@ -76,7 +73,9 @@
 
     <!-- SCREEN 1: HALAMAN DEPAN GOOGLE BERANDA -->
     <div id="screenHome" class="google-home">
-        <img class="logo" src="https://google.com" alt="Google">
+        <!-- PERBAIKAN: Menggunakan Kode SVG Yang Anda Berikan -->
+        <svg class="logo-svg" aria-label="Google" height="92" role="img" viewBox="0 0 272 92" width="272" xmlns="http://www.w3.org/2000/svg"><path d="M31.32 70.33c17.65.17 29.67-11.68 29.67-29.92q.01-2.29-.43-5.08H31.2v8.76h20.6c-1.1 11.47-9.18 17.44-20.27 17.44-12.44 0-21.96-9.35-21.96-22.94 0-13.41 9.1-22.77 21.96-22.77 6.48 0 11.26 2 16.04 6.9l6.14-6.43c-5.38-6.3-13.16-9.31-22.3-9.31C13.7 6.98 0 20.27 0 38.46c0 17.4 13.25 31.7 31.32 31.87" fill="#3186FF"></path><path d="M88.2 70.33c13.2 0 22.77-9.69 22.77-23.15 0-13.2-9.35-22.98-22.77-22.98-12.7 0-22.68 9.02-22.68 22.98 0 13.33 9.43 23.15 22.68 23.15m0-8.04c-8.04 0-13.67-6.6-13.67-15.1s5.93-14.95 13.67-14.95c8.17 0 13.67 6.6 13.67 14.94 0 8.64-5.63 15.11-13.67 15.11" fill="#FC413D"></path><path d="M137.42 70.33c13.29 0 22.77-9.73 22.77-23.15 0-13.2-9.35-22.98-22.77-22.98-12.7 0-22.68 9.02-22.68 22.98 0 13.33 9.43 23.15 22.68 23.15m0-8.04c-8.04 0-13.67-6.6-13.67-15.1s5.93-14.95 13.67-14.95c8.17 0 13.67 6.6 13.67 14.94 0 8.64-5.63 15.11-13.67 15.11" fill="#FFBE00"></path><path d="M185.37 88.57q21.51 0 21.5-24.63V25.77h-8.8v5.37h-.17c-2.75-4.27-7.96-6.68-13.84-6.68-12.7 0-20.44 9.69-20.44 22.6 0 12.86 7.53 22.34 20.78 22.34 6.52 0 11.34-3.72 13.37-6.77h.3v3.94c0 8.67-4.49 13.8-12.82 13.8-5.46 0-9.1-3.01-11.77-8.05l-7.96 3.52c4.2 8.84 10.16 12.73 19.85 12.73m0-27.55c-7.74 0-12.7-5.71-12.7-14.22 0-8.2 4.92-14.13 12.75-14.13s12.65 5.5 12.65 14.09c0 8.68-5.08 14.26-12.7 14.26" fill="#3186FF"></path><path d="M222.91 8.33h-9.22v60.6h9.22z" fill="#00AF57"></path><path d="M250.17 70.25a22.1 22.1 0 0 0 19-10.54l-6.86-4.49c-3 4.2-7.1 6.6-11.72 6.6a13.6 13.6 0 0 1-11.93-7.23l30.93-13.12a20 20 0 0 0-.84-3.22c-3.69-9.48-10.12-13.8-18.8-13.8-13.24 0-22.25 9.66-22.25 23.03 0 13.67 9.47 22.77 22.47 22.77m-13.5-22.81v-.51c0-8.76 5.03-14.64 12.95-14.64 3.76 0 7.15 1.69 9.44 5.67z" fill="#FC413D"></path></svg>
+        
         <div class="search-box-container">
             <input type="text" id="mainSearchInput" class="search-box" autocomplete="off" autofocus onkeydown="if(event.key === 'Enter') executeSearch()">
         </div>
@@ -88,7 +87,10 @@
     <!-- SCREEN 2: HALAMAN HASIL PENCARIAN GOOGLE -->
     <div id="screenResults" class="hidden">
         <div class="nav-bar">
-            <img class="logo-mini" src="https://google.com" alt="Google" onclick="goHome()">
+            <!-- Mini SVG Logo Resmi Google -->
+            <div class="logo-mini-container" onclick="goHome()">
+                <svg aria-label="Google" height="30" role="img" viewBox="0 0 272 92" width="88" xmlns="http://w3.org"><path d="M31.32 70.33c17.65.17 29.67-11.68 29.67-29.92q.01-2.29-.43-5.08H31.2v8.76h20.6c-1.1 11.47-9.18 17.44-20.27 17.44-12.44 0-21.96-9.35-21.96-22.94 0-13.41 9.1-22.77 21.96-22.77 6.48 0 11.26 2 16.04 6.9l6.14-6.43c-5.38-6.3-13.16-9.31-22.3-9.31C13.7 6.98 0 20.27 0 38.46c0 17.4 13.25 31.7 31.32 31.87" fill="#3186FF"></path><path d="M88.2 70.33c13.2 0 22.77-9.69 22.77-23.15 0-13.2-9.35-22.98-22.77-22.98-12.7 0-22.68 9.02-22.68 22.98 0 13.33 9.43 23.15 22.68 23.15m0-8.04c-8.04 0-13.67-6.6-13.67-15.1s5.93-14.95 13.67-14.95c8.17 0 13.67 6.6 13.67 14.94 0 8.64-5.63 15.11-13.67 15.11" fill="#FC413D"></path><path d="M137.42 70.33c13.29 0 22.77-9.73 22.77-23.15 0-13.2-9.35-22.98-22.77-22.98-12.7 0-22.68 9.02-22.68 22.98 0 13.33 9.43 23.15 22.68 23.15m0-8.04c-8.04 0-13.67-6.6-13.67-15.1s5.93-14.95 13.67-14.95c8.17 0 13.67 6.6 13.67 14.94 0 8.64-5.63 15.11-13.67 15.11" fill="#FFBE00"></path><path d="M185.37 88.57q21.51 0 21.5-24.63V25.77h-8.8v5.37h-.17c-2.75-4.27-7.96-6.68-13.84-6.68-12.7 0-20.44 9.69-20.44 22.6 0 12.86 7.53 22.34 20.78 22.34 6.52 0 11.34-3.72 13.37-6.77h.3v3.94c0 8.67-4.49 13.8-12.82 13.8-5.46 0-9.1-3.01-11.77-8.05l-7.96 3.52c4.2 8.84 10.16 12.73 19.85 12.73m0-27.55c-7.74 0-12.7-5.71-12.7-14.22 0-8.2 4.92-14.13 12.75-14.13s12.65 5.5 12.65 14.09c0 8.68-5.08 14.26-12.7 14.26" fill="#3186FF"></path><path d="M222.91 8.33h-9.22v60.6h9.22z" fill="#00AF57"></path><path d="M250.17 70.25a22.1 22.1 0 0 0 19-10.54l-6.86-4.49c-3 4.2-7.1 6.6-11.72 6.6a13.6 13.6 0 0 1-11.93-7.23l30.93-13.12a20 20 0 0 0-.84-3.22c-3.69-9.48-10.12-13.8-18.8-13.8-13.24 0-22.25 9.66-22.25 23.03 0 13.67 9.47 22.77 22.47 22.77m-13.5-22.81v-.51c0-8.76 5.03-14.64 12.95-14.64 3.76 0 7.15 1.69 9.44 5.67z" fill="#FC413D"></path></svg>
+            </div>
             <div class="search-box-mini-container">
                 <input type="text" id="miniSearchInput" class="search-box-mini" autocomplete="off" readonly>
             </div>
@@ -156,6 +158,7 @@
             const query = document.getElementById('mainSearchInput').value.trim().toLowerCase();
             if (query === "") return;
 
+            // Ditambahkan kata kunci "dadu 9 online" sesuai gambar bukti tangkapan layar Anda
             const kataKunciDadu = ["dadu", "kocok dadu", "roll dice", "putar dadu", "dice", "dadu 9", "9 biji dadu", "dadu 9 online"];
 
             if (kataKunciDadu.includes(query)) {
@@ -265,3 +268,4 @@
     </script>
 </body>
 </html>
+
