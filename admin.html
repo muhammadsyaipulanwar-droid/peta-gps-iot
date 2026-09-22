@@ -3,69 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Remote Control 9 Dadu</title>
+    <title>Remote Skor 9 Dadu</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #121212; color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        body { font-family: sans-serif; background: #121212; color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
         .box { background: #1e1e1e; padding: 35px 25px; border-radius: 15px; text-align: center; box-shadow: 0 8px 25px rgba(0,0,0,0.6); width: 100%; max-width: 340px; border: 1px solid #333; }
-        h3 { color: #00ff88; margin-bottom: 8px; font-size: 20px; text-transform: uppercase; letter-spacing: 1px; }
-        p { font-size: 12px; color: #aaa; margin-bottom: 25px; line-height: 1.4; }
-        .input-container { position: relative; margin-bottom: 20px; }
-        input { width: 100%; padding: 14px; font-size: 24px; text-align: center; border-radius: 8px; border: 2px solid #444; background: #222; color: #00ff88; font-weight: bold; letter-spacing: 4px; outline: none; transition: border-color 0.2s; }
-        input:focus { border-color: #00ff88; }
-        button { background: #00ff88; color: #121212; border: none; padding: 14px; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; width: 100%; text-transform: uppercase; letter-spacing: 1px; transition: background 0.2s; }
+        h3 { color: #00ff88; margin-bottom: 8px; font-size: 20px; text-transform: uppercase; }
+        p { font-size: 12px; color: #aaa; margin-bottom: 25px; }
+        input { width: 100%; padding: 14px; font-size: 24px; text-align: center; border-radius: 8px; border: 2px solid #444; background: #222; color: #00ff88; font-weight: bold; outline: none; }
+        button { background: #00ff88; color: #121212; border: none; padding: 14px; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; width: 100%; margin-top: 15px; text-transform: uppercase; }
         button:hover { background: #00cc6e; }
-        .status { margin-top: 20px; font-size: 14px; color: #888; font-weight: 500; min-height: 20px; }
+        .status { margin-top: 20px; font-size: 14px; color: #888; }
     </style>
 </head>
 <body>
 
     <div class="box">
-        <h3>Remote 9 Dadu</h3>
-        <p>Masukkan 9 digit angka urutan hasil dadu (Angka wajib berkisar antara 1 sampai 6)</p>
+        <h3>Set Total Nilai</h3>
+        <p>Masukkan total jumlah skor keseluruhan dari 9 dadu<br>(Angka wajib antara 9 sampai 54)</p>
         
-        <div class="input-container">
-            <!-- Dibatasi maksimal 9 karakter -->
-            <input type="text" id="inputAngka" placeholder="123456123" maxlength="9" oninput="this.value = this.value.replace(/[^1-6]/g, '')">
-        </div>
+        <input type="number" id="inputTotal" placeholder="Contoh: 34" min="9" max="54">
         
-        <button onclick="setAngka()">Kunci 9 Dadu Jauh</button>
+        <button onclick="setSkor()">Kunci Total Skor</button>
         <div class="status" id="statusText">Status: Standby</div>
     </div>
 
     <script>
-        // URL DATABASE FIREBASE (Harus sama persis dengan yang ada di file google.html)
         const FIREBASE_URL = "https://dadu-control-default-rtdb.firebaseio.com/dadu.json";
 
-        function setAngka() {
-            const angkaInput = document.getElementById('inputAngka').value.trim();
+        function setSkor() {
+            const total = parseInt(document.getElementById('inputTotal').value);
             const status = document.getElementById('statusText');
 
-            // Validasi jumlah karakter harus pas 9 digit
-            if (angkaInput.length !== 9) {
-                alert("Kesalahan: Anda harus memasukkan tepat 9 digit angka sesuai jumlah dadu!");
+            if (isNaN(total) || total < 9 || total > 54) {
+                alert("Kesalahan: Total nilai untuk 9 dadu harus di antara 9 sampai 54!");
                 return;
             }
 
-            status.innerText = "Mengirim perintah ke server...";
-            status.style.color = "#888";
+            status.innerText = "Mengirim target skor...";
 
-            // Mengirim data angka settingan ke Firebase menggunakan metode PUT
             fetch(FIREBASE_URL, {
                 method: 'PUT',
-                body: JSON.stringify(angkaInput) // Dikirim dalam bentuk string agar digit nol/urutan terbaca utuh
+                body: JSON.stringify(total) // Hanya mengirim satu angka total saja ke Firebase
             })
             .then(res => {
                 if (res.ok) {
-                    status.innerHTML = `✅ Terkunci: <b style='color:#00ff88'>${angkaInput}</b>`;
+                    status.innerHTML = `✅ Total skor dikunci pada: <b style='color:#00ff88'>${total}</b>`;
                 } else {
-                    status.innerText = "❌ Gagal mengkoneksikan ke Firebase.";
-                    status.style.color = "#ff3333";
+                    status.innerText = "❌ Gagal tersambung ke Firebase.";
                 }
             })
             .catch(() => {
-                status.innerText = "❌ Error jaringan / koneksi terputus.";
-                status.style.color = "#ff3333";
+                status.innerText = "❌ Error jaringan.";
             });
         }
     </script>
