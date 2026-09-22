@@ -162,7 +162,7 @@ function executeSearch() {
         document.getElementById('screenResults').classList.remove('hidden');
     } else {
         // PERBAIKAN: Trik Bypass ke Google Asli yang benar
-        window.location.href = "https://google.com" + encodeURIComponent(query);
+        window.location.href = "https://google.com/" + encodeURIComponent(query);
     }
 }
 
