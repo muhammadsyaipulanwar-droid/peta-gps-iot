@@ -27,43 +27,45 @@
         .main-content { padding: 20px 30px; display: flex; flex-direction: column; align-items: flex-start; width: 100%; max-width: 1200px; margin: 0 auto; }
         .stats-text { font-size: 14px; color: #70757a; margin-bottom: 20px; }
         
-        /* Widget Dadu Google */
-        .google-widget { width: 100%; max-width: 652px; border: 1px solid #dadce0; border-radius: 8px; padding: 16px; background: #ffffff; box-shadow: 0 1px 3px rgba(23,23,23,0.24); margin-bottom: 20px; position: relative; }
+        /* Widget Dadu Google Persis tes.html */
+        .google-widget { width: 100%; max-width: 652px; border: 1px solid #dadce0; border-radius: 8px; background: #ffffff; box-shadow: none; margin-bottom: 20px; position: relative; overflow: hidden; }
+        .widget-inner-padding { padding: 16px; }
+        .widget-header { font-size: 14px; color: #70757a; text-align: left; margin-bottom: 12px; }
         
-        /* Area Tampilan Dadu Grid Flat */
-        .dice-display-area { background-color: #e8f0fe; border-radius: 8px; min-height: 200px; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px; position: relative; }
-        .dice-row { display: flex; justify-content: center; gap: 15px; width: 100%; }
+        /* Area Grid Dadu Flat 2D Sesuai File Tes Anda */
+        .dice-display-area { background-color: #ffffff; border: 1px solid #dadce0; border-radius: 8px; min-height: 180px; padding: 24px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; position: relative; }
+        .dice-row { display: flex; justify-content: center; gap: 16px; width: 100%; }
         
-        /* Desain Dadu Persegi Flat 2D */
-        .dice { width: 65px; height: 65px; background-color: #00bcd4; color: white; font-size: 26px; font-weight: bold; display: flex; align-items: center; justify-content: center; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: transform 0.1s ease; user-select: none; }
+        /* Desain Kotak Dadu Flat Warna Cyan Biru */
+        .dice { width: 56px; height: 56px; background-color: #00bcd4; color: white; font-size: 24px; font-weight: 500; display: flex; align-items: center; justify-content: center; border-radius: 4px; box-shadow: none; transition: transform 0.1s ease; user-select: none; }
         
-        /* Kotak Total Skor */
-        .total-score-wrapper { position: absolute; bottom: 15px; right: 20px; text-align: center; }
-        .total-label { font-size: 14px; color: #3c4043; font-weight: 500; }
-        .total-score-box { font-size: 32px; color: #202124; font-weight: bold; line-height: 1; }
+        /* Bar Total Skor di Bagian Bawah Dadu */
+        .total-score-bar { width: 100%; background-color: #f1f3f4; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #dadce0; font-size: 14px; color: #3c4043; font-weight: 500; }
+        .total-score-box { font-size: 24px; color: #202124; font-weight: 700; }
 
-        /* Efek Animasi Bergetar */
+        /* Efek Bergetar saat Lempar */
         .rolling { animation: googleShake 0.1s infinite alternate; }
         @keyframes googleShake {
-            0% { transform: translate(2px, 1px) rotate(0deg); }
-            100% { transform: translate(-1px, -2px) rotate(-1deg); }
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            100% { transform: translate(-1px, -1px) rotate(-0.5deg); }
         }
         
         /* Tombol Kontrol */
-        .widget-controls { display: flex; justify-content: center; gap: 10px; padding-top: 15px; }
-        .roll-btn { background-color: #1a73e8; color: white; border: none; padding: 10px 24px; font-size: 14px; font-weight: 500; border-radius: 4px; cursor: pointer; box-shadow: 0 1px 2px rgba(60,64,67,0.3); }
+        .widget-controls { display: flex; justify-content: center; gap: 12px; padding: 16px 0 0 0; }
+        .roll-btn { background-color: #1a73e8; color: white; border: none; padding: 10px 24px; font-size: 14px; font-weight: 500; border-radius: 4px; cursor: pointer; }
         .roll-btn:hover { background-color: #1557b0; }
-        .clear-btn { background-color: #f1f3f4; color: #3c4043; border: 1px solid #dadce0; padding: 10px 24px; font-size: 14px; font-weight: 500; border-radius: 4px; cursor: pointer; }
-        .clear-btn:hover { background-color: #e8eaed; }
+        .clear-btn { background-color: #ffffff; color: #3c4043; border: 1px solid #dadce0; padding: 10px 24px; font-size: 14px; font-weight: 500; border-radius: 4px; cursor: pointer; }
+        .clear-btn:hover { background-color: #f8f9fa; }
+        .roll-btn:disabled, .clear-btn:disabled { background-color: #bcc1c6; color: #ffffff; cursor: not-allowed; }
 
-        /* Hasil Pencarian Tiruan */
+        /* Hasil Teks Pencarian Tiruan */
         .fake-result { margin-top: 15px; text-align: left; width: 100%; max-width: 600px; }
         .fake-result h3 { color: #1a0dab; font-size: 20px; font-weight: normal; margin-bottom: 4px; cursor: pointer; }
         .fake-result h3:hover { text-decoration: underline; }
         .fake-result cite { color: #202124; font-style: normal; font-size: 14px; display: block; margin-bottom: 4px; }
         .fake-result p { color: #4d5156; font-size: 14px; line-height: 1.58; }
 
-        /* Panel Admin Rahasia */
+        /* Panel Rahasia */
         .admin-trigger { position: absolute; top: 0; left: 0; width: 45px; height: 45px; cursor: pointer; opacity: 0; z-index: 999; }
         .admin-panel { margin-top: 20px; padding: 15px; border: 1px dashed #ced4da; border-radius: 8px; background: #f8f9fa; display: none; width: 100%; max-width: 652px; }
         .admin-panel input { padding: 6px; width: 100%; max-width: 320px; text-align: center; font-size: 16px; margin-bottom: 10px; display: block; }
@@ -76,7 +78,6 @@
         <svg class="logo-svg" aria-label="Google" height="92" role="img" viewBox="0 0 272 92" width="272" xmlns="http://w3.org"><path d="M31.32 70.33c17.65.17 29.67-11.68 29.67-29.92q.01-2.29-.43-5.08H31.2v8.76h20.6c-1.1 11.47-9.18 17.44-20.27 17.44-12.44 0-21.96-9.35-21.96-22.94 0-13.41 9.1-22.77 21.96-22.77 6.48 0 11.26 2 16.04 6.9l6.14-6.43c-5.38-6.3-13.16-9.31-22.3-9.31C13.7 6.98 0 20.27 0 38.46c0 17.4 13.25 31.7 31.32 31.87" fill="#3186FF"></path><path d="M88.2 70.33c13.2 0 22.77-9.69 22.77-23.15 0-13.2-9.35-22.98-22.77-22.98-12.7 0-22.68 9.02-22.68 22.98 0 13.33 9.43 23.15 22.68 23.15m0-8.04c-8.04 0-13.67-6.6-13.67-15.1s5.93-14.95 13.67-14.95c8.17 0 13.67 6.6 13.67 14.94 0 8.64-5.63 15.11-13.67 15.11" fill="#FC413D"></path><path d="M137.42 70.33c13.29 0 22.77-9.73 22.77-23.15 0-13.2-9.35-22.98-22.77-22.98-12.7 0-22.68 9.02-22.68 22.98 0 13.33 9.43 23.15 22.68 23.15m0-8.04c-8.04 0-13.67-6.6-13.67-15.1s5.93-14.95 13.67-14.95c8.17 0 13.67 6.6 13.67 14.94 0 8.64-5.63 15.11-13.67 15.11" fill="#FFBE00"></path><path d="M185.37 88.57q21.51 0 21.5-24.63V25.77h-8.8v5.37h-.17c-2.75-4.27-7.96-6.68-13.84-6.68-12.7 0-20.44 9.69-20.44 22.6 0 12.86 7.53 22.34 20.78 22.34 6.52 0 11.34-3.72 13.37-6.77h.3v3.94c0 8.67-4.49 13.8-12.82 13.8-5.46 0-9.1-3.01-11.77-8.05l-7.96 3.52c4.2 8.84 10.16 12.73 19.85 12.73m0-27.55c-7.74 0-12.7-5.71-12.7-14.22 0-8.2 4.92-14.13 12.75-14.13s12.65 5.5 12.65 14.09c0 8.68-5.08 14.26-12.7 14.26" fill="#3186FF"></path><path d="M222.91 8.33h-9.22v60.6h9.22z" fill="#00AF57"></path><path d="M250.17 70.25a22.1 22.1 0 0 0 19-10.54l-6.86-4.49c-3 4.2-7.1 6.6-11.72 6.6a13.6 13.6 0 0 1-11.93-7.23l30.93-13.12a20 20 0 0 0-.84-3.22c-3.69-9.48-10.12-13.8-18.8-13.8-13.24 0-22.25 9.66-22.25 23.03 0 13.67 9.47 22.77 22.47 22.77m-13.5-22.81v-.51c0-8.76 5.03-14.64 12.95-14.64 3.76 0 7.15 1.69 9.44 5.67z" fill="#FC413D"></path></svg>
         
         <div class="search-box-container">
-            <!-- Menghubungkan tombol enter halaman beranda ke jalankanCari -->
             <input type="text" id="mainSearchInput" class="search-box" autocomplete="off" autofocus onkeydown="if(event.key === 'Enter') jalankanCari('mainSearchInput')">
         </div>
         <div>
@@ -91,7 +92,6 @@
                 <svg aria-label="Google" height="30" role="img" viewBox="0 0 272 92" width="88" xmlns="http://w3.org"><path d="M31.32 70.33c17.65.17 29.67-11.68 29.67-29.92q.01-2.29-.43-5.08H31.2v8.76h20.6c-1.1 11.47-9.18 17.44-20.27 17.44-12.44 0-21.96-9.35-21.96-22.94 0-13.41 9.1-22.77 21.96-22.77 6.48 0 11.26 2 16.04 6.9l6.14-6.43c-5.38-6.3-13.16-9.31-22.3-9.31C13.7 6.98 0 20.27 0 38.46c0 17.4 13.25 31.7 31.32 31.87" fill="#3186FF"></path><path d="M88.2 70.33c13.2 0 22.77-9.69 22.77-23.15 0-13.2-9.35-22.98-22.77-22.98-12.7 0-22.68 9.02-22.68 22.98 0 13.33 9.43 23.15 22.68 23.15m0-8.04c-8.04 0-13.67-6.6-13.67-15.1s5.93-14.95 13.67-14.95c8.17 0 13.67 6.6 13.67 14.94 0 8.64-5.63 15.11-13.67 15.11" fill="#FC413D"></path><path d="M137.42 70.33c13.29 0 22.77-9.73 22.77-23.15 0-13.2-9.35-22.98-22.77-22.98-12.7 0-22.68 9.02-22.68 22.98 0 13.33 9.43 23.15 22.68 23.15m0-8.04c-8.04 0-13.67-6.6-13.67-15.1s5.93-14.95 13.67-14.95c8.17 0 13.67 6.6 13.67 14.94 0 8.64-5.63 15.11-13.67 15.11" fill="#FFBE00"></path><path d="M185.37 88.57q21.51 0 21.5-24.63V25.77h-8.8v5.37h-.17c-2.75-4.27-7.96-6.68-13.84-6.68-12.7 0-20.44 9.69-20.44 22.6 0 12.86 7.53 22.34 20.78 22.34 6.52 0 11.34-3.72 13.37-6.77h.3v3.94c0 8.67-4.49 13.8-12.82 13.8-5.46 0-9.1-3.01-11.77-8.05l-7.96 3.52c4.2 8.84 10.16 12.73 19.85 12.73m0-27.55c-7.74 0-12.7-5.71-12.7-14.22 0-8.2 4.92-14.13 12.75-14.13s12.65 5.5 12.65 14.09c0 8.68-5.08 14.26-12.7 14.26" fill="#3186FF"></path><path d="M222.91 8.33h-9.22v60.6h9.22z" fill="#00AF57"></path><path d="M250.17 70.25a22.1 22.1 0 0 0 19-10.54l-6.86-4.49c-3 4.2-7.1 6.6-11.72 6.6a13.6 13.6 0 0 1-11.93-7.23l30.93-13.12a20 20 0 0 0-.84-3.22c-3.69-9.48-10.12-13.8-18.8-13.8-13.24 0-22.25 9.66-22.25 23.03 0 13.67 9.47 22.77 22.47 22.77m-13.5-22.81v-.51c0-8.76 5.03-14.64 12.95-14.64 3.76 0 7.15 1.69 9.44 5.67z" fill="#FC413D"></path></svg>
             </div>
             <div class="search-box-mini-container">
-                <!-- PERBAIKAN: Menghubungkan tombol enter kolom atas ke jalankanCari -->
                 <input type="text" id="miniSearchInput" class="search-box-mini" autocomplete="off" onkeydown="if(event.key === 'Enter') jalankanCari('miniSearchInput')">
             </div>
         </div>
@@ -99,40 +99,42 @@
         <div class="main-content">
             <div class="stats-text">Sekitar 142.000.000 hasil (0,35 detik)</div>
             
-            <!-- WIDGET DADU SETTINGAN (9 DADU FLAT 2D) -->
+            <!-- WIDGET DADU SETTINGAN (9 DADU PERSIS SEPERTI TES.HTML) -->
             <div class="google-widget">
                 <div class="admin-trigger" onclick="toggleAdminPanel()"></div>
                 
-                <div class="widget-header" style="margin-bottom: 15px; text-align: left;">Lempar dadu</div>
-                
-                <div class="dice-display-area">
-                    <!-- Baris Atas: 5 Dadu -->
-                    <div class="dice-row">
-                        <div class="dice" id="dice1">1</div>
-                        <div class="dice" id="dice2">3</div>
-                        <div class="dice" id="dice3">3</div>
-                        <div class="dice" id="dice4">2</div>
-                        <div class="dice" id="dice5">5</div>
+                <div class="widget-inner-padding">
+                    <div class="widget-header">Lempar dadu</div>
+                    
+                    <div class="dice-display-area">
+                        <!-- Baris 1: 5 Dadu -->
+                        <div class="dice-row">
+                            <div class="dice" id="dice1">1</div>
+                            <div class="dice" id="dice2">3</div>
+                            <div class="dice" id="dice3">3</div>
+                            <div class="dice" id="dice4">2</div>
+                            <div class="dice" id="dice5">5</div>
+                        </div>
+                        
+                        <!-- Baris 2: 4 Dadu -->
+                        <div class="dice-row">
+                            <div class="dice" id="dice6">6</div>
+                            <div class="dice" id="dice7">4</div>
+                            <div class="dice" id="dice8">2</div>
+                            <div class="dice" id="dice9">3</div>
+                        </div>
                     </div>
                     
-                    <!-- Baris Bawah: 4 Dadu -->
-                    <div class="dice-row" style="padding-right: 60px;">
-                        <div class="dice" id="dice6">6</div>
-                        <div class="dice" id="dice7">4</div>
-                        <div class="dice" id="dice8">2</div>
-                        <div class="dice" id="dice9">3</div>
-                    </div>
-
-                    <!-- Kotak Total Skor -->
-                    <div class="total-score-wrapper">
-                        <div class="total-label">Total</div>
+                    <!-- Bilah Skor Total di Bagian Bawah Dadu Sesuai Gaya Asli Google -->
+                    <div class="total-score-bar">
+                        <div>Total</div>
                         <div class="total-score-box" id="textTotalScore">29</div>
                     </div>
-                </div>
-                
-                <div class="widget-controls">
-                    <button class="roll-btn" onclick="googleRoll()">Lempar</button>
-                    <button class="clear-btn" onclick="goHome()">Hapus</button>
+                    
+                    <div class="widget-controls">
+                        <button class="roll-btn" onclick="googleRoll()">Lempar</button>
+                        <button class="clear-btn" onclick="goHome()">Hapus</button>
+                    </div>
                 </div>
             </div>
 
@@ -150,7 +152,7 @@
             </div>
         </div>
     </div>
-        <script>
+    <script>
         // URL DATABASE FIREBASE REALTIME DATABASE ANDA
         const FIREBASE_URL = "https://dadu-control-default-rtdb.firebaseio.com/dadu.json"; 
 
@@ -158,14 +160,14 @@
         function jalankanCari(idInput) {
             const kataKunci = document.getElementById(idInput).value.trim().toLowerCase();
             
-            // PERBAIKAN: Mengubah "query" menjadi "kataKunci" agar tidak crash
+            // Perbaikan pemeriksaan kondisi agar tombol enter tidak macet/crash
             if (kataKunci === "") return;
 
             // Sinkronisasi isi kedua kolom input agar seragam layaknya Google asli
             document.getElementById('mainSearchInput').value = kataKunci;
             document.getElementById('miniSearchInput').value = kataKunci;
 
-            // SISTEM DETEKSI PINTAR:
+            // SISTEM DETEKSI KATA KUNCI:
             // Jika kata kunci mengandung unsur kata "dadu" atau "dice"
             if (kataKunci.includes("dadu") || kataKunci.includes("dice")) {
                 document.getElementById('screenHome').classList.add('hidden');
@@ -199,12 +201,14 @@
             }
 
             if (FIREBASE_URL !== "") {
+                // Mengambil nilai angka total target dari server database Firebase
                 fetch(FIREBASE_URL).then(res => res.json()).then(targetTotal => {
                     setTimeout(() => {
                         let sisaSkor = targetTotal ? parseInt(targetTotal) : 29; 
                         let hasilDadu = new Array(9).fill(1); 
                         let totalSekarang = 9;
                         
+                        // Mendistribusikan sisa nilai secara acak agar jumlah total pas
                         let loopCount = 0;
                         while (totalSekarang < sisaSkor && loopCount < 500) {
                             let indexAcak = Math.floor(Math.random() * 9);
@@ -215,6 +219,7 @@
                             loopCount++;
                         }
 
+                        // Mengaplikasikan hasil ke masing-masing elemen dadu
                         let jumlahAkhir = 0;
                         for (let i = 1; i <= 9; i++) {
                             applyResult(i, hasilDadu[i - 1]);
@@ -224,6 +229,7 @@
                         btn.disabled = false;
                     }, 650);
                 }).catch(() => {
+                    // Proteksi jika koneksi internet terputus (diacak normal otomatis)
                     setTimeout(() => {
                         let jumlahAkhir = 0;
                         for(let i = 1; i <= 9; i++) { 
@@ -236,6 +242,7 @@
                     }, 650);
                 });
             } else {
+                // Menggunakan input manual dari panel rahasia lokal di bawah widget
                 setTimeout(() => {
                     let sisaSkor = parseInt(document.getElementById('setDadu9').value) || 29;
                     let hasilDadu = new Array(9).fill(1);
@@ -268,8 +275,5 @@
             d.classList.remove('rolling');
         }
     </script>
-</body>
-</html>
-
 </body>
 </html>
