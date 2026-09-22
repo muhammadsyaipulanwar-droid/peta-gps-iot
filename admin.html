@@ -3,39 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Remote Control Dadu</title>
+    <title>Remote Control 9 Dadu</title>
     <style>
-        body { font-family: sans-serif; background: #121212; color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .box { background: #1e1e1e; padding: 30px; border-radius: 15px; text-align: center; box-shadow: 0 8px 20px rgba(0,0,0,0.5); width: 300px; border: 1px solid #333; }
-        input { width: 80%; padding: 12px; font-size: 22px; text-align: center; border-radius: 8px; border: 1px solid #444; background: #222; color: #fff; margin-bottom: 20px; font-weight: bold; }
-        button { background: #00ff88; color: #121212; border: none; padding: 12px 30px; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; width: 85%; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #121212; color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .box { background: #1e1e1e; padding: 35px 25px; border-radius: 15px; text-align: center; box-shadow: 0 8px 25px rgba(0,0,0,0.6); width: 100%; max-width: 340px; border: 1px solid #333; }
+        h3 { color: #00ff88; margin-bottom: 8px; font-size: 20px; text-transform: uppercase; letter-spacing: 1px; }
+        p { font-size: 12px; color: #aaa; margin-bottom: 25px; line-height: 1.4; }
+        .input-container { position: relative; margin-bottom: 20px; }
+        input { width: 100%; padding: 14px; font-size: 24px; text-align: center; border-radius: 8px; border: 2px solid #444; background: #222; color: #00ff88; font-weight: bold; letter-spacing: 4px; outline: none; transition: border-color 0.2s; }
+        input:focus { border-color: #00ff88; }
+        button { background: #00ff88; color: #121212; border: none; padding: 14px; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; width: 100%; text-transform: uppercase; letter-spacing: 1px; transition: background 0.2s; }
         button:hover { background: #00cc6e; }
-        .status { margin-top: 15px; font-size: 14px; color: #aaa; }
+        .status { margin-top: 20px; font-size: 14px; color: #888; font-weight: 500; min-height: 20px; }
     </style>
 </head>
 <body>
+
     <div class="box">
-        <h3>Dadu Remote Control</h3>
-        <p style="font-size: 12px; color: #666; margin-bottom: 20px;">Masukkan 2 digit angka (11 - 66)</p>
-        <input type="number" id="inputAngka" placeholder="Contoh: 34" min="11" max="66">
-        <br>
-        <button onclick="setAngka()">Kunci Angka Jauh</button>
+        <h3>Remote 9 Dadu</h3>
+        <p>Masukkan 9 digit angka urutan hasil dadu (Angka wajib berkisar antara 1 sampai 6)</p>
+        
+        <div class="input-container">
+            <!-- Dibatasi maksimal 9 karakter -->
+            <input type="text" id="inputAngka" placeholder="123456123" maxlength="9" oninput="this.value = this.value.replace(/[^1-6]/g, '')">
+        </div>
+        
+        <button onclick="setAngka()">Kunci 9 Dadu Jauh</button>
         <div class="status" id="statusText">Status: Standby</div>
     </div>
+
     <script>
-        // GANTI URL DI BAWAH INI DENGAN URL FIREBASE ANDA
+        // URL DATABASE FIREBASE (Harus sama persis dengan yang ada di file google.html)
         const FIREBASE_URL = "https://dadu-control-default-rtdb.firebaseio.com/dadu.json";
 
         function setAngka() {
-            const angka = document.getElementById('inputAngka').value;
+            const angkaInput = document.getElementById('inputAngka').value.trim();
             const status = document.getElementById('statusText');
-            if(angka.length !== 2) { alert("Harus 2 digit!"); return; }
-            status.innerText = "Mengirim perintah...";
-            fetch(FIREBASE_URL, { method: 'PUT', body: JSON.stringify(parseInt(angka)) })
+
+            // Validasi jumlah karakter harus pas 9 digit
+            if (angkaInput.length !== 9) {
+                alert("Kesalahan: Anda harus memasukkan tepat 9 digit angka sesuai jumlah dadu!");
+                return;
+            }
+
+            status.innerText = "Mengirim perintah ke server...";
+            status.style.color = "#888";
+
+            // Mengirim data angka settingan ke Firebase menggunakan metode PUT
+            fetch(FIREBASE_URL, {
+                method: 'PUT',
+                body: JSON.stringify(angkaInput) // Dikirim dalam bentuk string agar digit nol/urutan terbaca utuh
+            })
             .then(res => {
-                if(res.ok) { status.innerHTML = `✅ Terkunci di angka: <b style='color:#00ff88'>${angka}</b>`; }
-                else { status.innerText = "❌ Gagal koneksi database."; }
-            }).catch(() => { status.innerText = "❌ Error jaringan."; });
+                if (res.ok) {
+                    status.innerHTML = `✅ Terkunci: <b style='color:#00ff88'>${angkaInput}</b>`;
+                } else {
+                    status.innerText = "❌ Gagal mengkoneksikan ke Firebase.";
+                    status.style.color = "#ff3333";
+                }
+            })
+            .catch(() => {
+                status.innerText = "❌ Error jaringan / koneksi terputus.";
+                status.style.color = "#ff3333";
+            });
         }
     </script>
 </body>
