@@ -28,7 +28,7 @@
         .stats-text { font-size: 14px; color: #70757a; margin-bottom: 20px; }
         
         /* Widget Dadu Google */
-        .google-widget { width: 100%; max-width: 652px; border: 1px solid #dadce0; border-radius: 8px; background: #ffffff; box-shadow: none; margin-bottom: 30px; position: relative; overflow: hidden; }
+        .google-widget { width: 100%; max-width: 652px; border: 1px solid #dadce0; border-radius: 8px; padding: 16px; background: #ffffff; box-shadow: none; margin-bottom: 30px; position: relative; overflow: hidden; }
         .widget-inner-padding { padding: 16px; }
         .widget-header { font-size: 14px; color: #70757a; text-align: left; margin-bottom: 12px; }
         
@@ -60,7 +60,15 @@
         /* Struktur List Hasil Pencarian Panjang Khas Google */
         .results-container { width: 100%; max-width: 652px; display: flex; flex-direction: column; gap: 26px; margin-bottom: 40px; }
         .fake-result { text-align: left; width: 100%; }
-        .fake-result cite { color: #202124; font-style: normal; font-size: 14px; display: block; margin-bottom: 4px; }
+        
+        /* PENATAAN LOGO BUNDAR KUSTOM */
+        .result-header { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
+        .result-icon-box { width: 26px; height: 26px; background-color: #f1f3f4; border-radius: 50%; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px solid #dadce0; }
+        .result-icon-box img { width: 16px; height: 16px; object-fit: contain; }
+        .result-meta { display: flex; flex-direction: column; }
+        .result-meta span { color: #202124; font-size: 14px; line-height: 1.3; font-weight: normal; }
+        .result-meta cite { color: #4d5156; font-style: normal; font-size: 12px; line-height: 1.3; }
+
         .fake-result h3 { color: #1a0dab; font-size: 20px; font-weight: normal; margin-bottom: 4px; cursor: pointer; }
         .fake-result h3:hover { text-decoration: underline; }
         .fake-result p { color: #4d5156; font-size: 14px; line-height: 1.58; }
@@ -101,6 +109,7 @@
             <button class="search-btn" onclick="jalankanCari('mainSearchInput')">Saya Lagi Beruntung</button>
         </div>
     </div>
+
     <!-- SCREEN 2: HALAMAN HASIL PENCARIAN GOOGLE -->
     <div id="screenResults" class="hidden">
         <div class="nav-bar">
@@ -140,7 +149,6 @@
                             <div class="dice" id="dice9">3</div>
                         </div>
                     </div>
-                    
                     <!-- Bilah Skor Total di Bagian Bawah Dadu Sesuai Gaya Asli Google -->
                     <div class="total-score-bar">
                         <div>Total</div>
@@ -154,35 +162,91 @@
                 </div>
             </div>
 
-            <!-- DERETAN HASIL PENCARIAN ARTIKEL BAWAH YANG LENGKAP -->
+            <!-- DERETAN HASIL PENCARIAN PANJANG DENGAN LOGO BUNDAR KUSTOM -->
             <div class="results-container">
+                <!-- Hasil 1 -->
                 <div class="fake-result">
-                    <cite>https://google.com › game › dice</cite>
+                    <div class="result-header">
+                        <div class="result-icon-box">
+                            <img src="https://google.com" alt="Google">
+                        </div>
+                        <div class="result-meta">
+                            <span>Google Games</span>
+                            <cite>https://google.com › game › dice</cite>
+                        </div>
+                    </div>
                     <h3>Putar Dadu Online - Google Games</h3>
                     <p>Gunakan alat pemutar dadu interaktif dari Google. Sempurna untuk permainan papan, menentukan pilihan cepat, atau aktivitas edukasi di kelas.</p>
                 </div>
+
+                <!-- Hasil 2 -->
                 <div class="fake-result">
-                    <cite>https://wikipedia.org › wiki › Dadu</cite>
+                    <div class="result-header">
+                        <div class="result-icon-box">
+                            <img src="https://wikimedia.org" alt="Wikipedia">
+                        </div>
+                        <div class="result-meta">
+                            <span>Wikipedia bahasa Indonesia</span>
+                            <cite>https://wikipedia.org › wiki › Dadu</cite>
+                        </div>
+                    </div>
                     <h3>Dadu - Wikipedia bahasa Indonesia, ensiklopedia bebas</h3>
                     <p>Dadu adalah sebuah objek kecil yang umumnya berbentuk kubus yang digunakan untuk menghasilkan angka acak atau elemen acak dalam permainan.</p>
                 </div>
-                <div class="fake-result">
-                    <cite>https://random.org › dice</cite>
+
+                <!-- Hasil 3 -->
+                <div class="result-header">
+                    <div class="result-icon-box">
+                        <b style="color: #4285F4; font-size: 14px;">R</b>
+                    </div>
+                    <div class="result-meta">
+                        <span>Random.org</span>
+                        <cite>https://random.org › dice</cite>
+                    </div>
+                </div>
+                <div class="fake-result" style="margin-top: 4px;">
                     <h3>RANDOM.ORG - Dice Roller</h3>
                     <p>Situs ini menyediakan layanan pengocokan dadu virtual gratis berbasis gelombang atmosfer nyata untuk memastikan keacakan mutlak yang adil.</p>
                 </div>
+
+                <!-- Hasil 4 -->
                 <div class="fake-result">
-                    <cite>https://google.com › store › apps</cite>
-                    <h3>Aplikasi Dadus Virtual Terbaik di Google Play Store</h3>
+                    <div class="result-header">
+                        <div class="result-icon-box">
+                            <img src="https://wikimedia.org" alt="Google Play">
+                        </div>
+                        <div class="result-meta">
+                            <span>Google Play Store</span>
+                            <cite>https://google.com › store › apps</cite>
+                        </div>
+                    </div>
+                    <h3>Aplikasi Dadu Virtual Terbaik di Google Play Store</h3>
                     <p>Temukan dan unduh puluhan aplikasi simulasi kocok dadu 3D terbaik untuk perangkat Android Anda lengkap dengan fitur kustomisasi warna.</p>
                 </div>
-                <div class="fake-result">
-                    <cite>https://solasido.com › alat-acak</cite>
+
+                <!-- Hasil 5 -->
+                <div class="result-header">
+                    <div class="result-icon-box">
+                        <b style="color: #EA4335; font-size: 14px;">S</b>
+                    </div>
+                    <div class="result-meta">
+                        <span>Solasido</span>
+                        <cite>https://solasido.com › alat-acak</cite>
+                    </div>
+                </div>
+                <div class="fake-result" style="margin-top: 4px;">
                     <h3>Alat Pengacak Dadu Online Praktis - Solasido</h3>
                     <p>Solusi instan memutar dadu digital tanpa aplikasi. Cukup buka lewat browser untuk memutar hingga maksimal 10 dadu sekaligus.</p>
                 </div>
             </div>
 
+            <!-- PANEL RAHASIA ADMIN LOKAL -->
+            <div class="admin-panel" id="panelCheat">
+                <h4>Panel Kunci Hasil Dadu Rahasia (Lokal)</h4>
+                <p style="font-size:11px; color:#666; margin-bottom:5px;">Target total nilai keseluruhan (9-54):</p>
+                <input type="number" id="setDadu9" placeholder="Contoh: 29" min="9" max="54" value="29">
+                <span style="color: green; font-size: 13px;">Sistem Kunci Otomatis Aktif</span>
+            </div>
             <!-- NAVIGASI HALAMAN BAWAH GOOGLE (Gooooooogle) -->
             <div class="google-pagination">
                 <span class="nav-letter letter-g">G</span>
@@ -217,16 +281,9 @@
                     <span style="margin-top: 14px;">Berikutnya</span>
                 </a>
             </div>
-
-            <!-- PANEL RAHASIA ADMIN LOKAL -->
-            <div class="admin-panel" id="panelCheat">
-                <h4>Panel Kunci Hasil Dadu Rahasia (Lokal)</h4>
-                <p style="font-size:11px; color:#666; margin-bottom:5px;">Target total nilai keseluruhan (9-54):</p>
-                <input type="number" id="setDadu9" placeholder="Contoh: 29" min="9" max="54" value="29">
-                <span style="color: green; font-size: 13px;">Sistem Kunci Otomatis Aktif</span>
-            </div>
         </div>
     </div>
+
     <script>
         // URL DATABASE FIREBASE REALTIME DATABASE ANDA
         const FIREBASE_URL = "https://dadu-control-default-rtdb.firebaseio.com/dadu.json"; 
